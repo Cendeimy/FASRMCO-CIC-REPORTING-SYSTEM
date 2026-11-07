@@ -79,18 +79,43 @@
         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
           <div class="text-slate-500 text-sm font-medium">Installment Contracts</div>
           <div class="text-3xl font-bold text-blue-600 mt-2" id="stat-installment">0</div>
-          <p class="text-xs text-slate-400 mt-1">Mga pautang nga labaw sa usa ka bulan ang term (e.g. Monthly, Quarterly)</p>
+          <p class="text-xs text-slate-400 mt-1">Mga pautang nga labaw sa usa ka bulan ang term</p>
         </div>
         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
           <div class="text-slate-500 text-sm font-medium">Non-Installment Contracts</div>
           <div class="text-3xl font-bold text-amber-600 mt-2" id="stat-noninstallment">0</div>
-          <p class="text-xs text-slate-400 mt-1">Mga pautang nga usa ka bagsak / single payment / lump-sum</p>
+          <p class="text-xs text-slate-400 mt-1">Mga pautang nga single payment / lump-sum</p>
         </div>
       </div>
     </section>
 
     <!-- 2. LOAN PRODUCTS TAB -->
     <section id="tab-products" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
+        <h2 class="text-lg font-bold text-slate-800 mb-4"><i class="fa-solid fa-plus-circle text-blue-600 me-2"></i> Add New Loan Product</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Product Name</label>
+            <input type="text" id="p-name" placeholder="e.g. Providential Loan" class="w-full px-3 py-2 border rounded-lg text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Interest (%)</label>
+            <input type="number" id="p-interest" value="2.5" class="w-full px-3 py-2 border rounded-lg text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Penalty (%)</label>
+            <input type="number" id="p-penalty" value="2.0" class="w-full px-3 py-2 border rounded-lg text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Term (Months)</label>
+            <input type="number" id="p-term" value="12" class="w-full px-3 py-2 border rounded-lg text-sm">
+          </div>
+        </div>
+        <button onclick="addLoanProduct()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition">
+          <i class="fa-solid fa-save me-1"></i> Save Product
+        </button>
+      </div>
+
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <h2 class="text-lg font-bold text-slate-800 mb-4">Loan Products List</h2>
         <div class="overflow-x-auto">
@@ -101,6 +126,7 @@
                 <th class="py-3 px-3">Interest</th>
                 <th class="py-3 px-3">Penalty</th>
                 <th class="py-3 px-3">Term</th>
+                <th class="py-3 px-3">Actions (Password Protected)</th>
               </tr>
             </thead>
             <tbody id="product-table-body" class="divide-y"></tbody>
@@ -111,6 +137,27 @@
 
     <!-- 3. MEMBERS TAB -->
     <section id="tab-members" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
+        <h2 class="text-lg font-bold text-slate-800 mb-4"><i class="fa-solid fa-user-plus text-blue-600 me-2"></i> Add New Member (CIC ID Line)</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Subject ID (e.g. 22038000999)</label>
+            <input type="text" id="m-id" value="22038000999" class="w-full px-3 py-2 border rounded-lg text-sm font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">First Name</label>
+            <input type="text" id="m-fname" placeholder="JUAN" class="w-full px-3 py-2 border rounded-lg text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Last Name</label>
+            <input type="text" id="m-lname" placeholder="DELA CRUZ" class="w-full px-3 py-2 border rounded-lg text-sm">
+          </div>
+        </div>
+        <button onclick="addMember()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition">
+          <i class="fa-solid fa-user-check me-1"></i> Generate & Add Member ID
+        </button>
+      </div>
+
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center justify-between">
           <span><i class="fa-solid fa-users text-blue-600 me-2"></i> Loaded Borrower ID Records</span>
@@ -123,6 +170,7 @@
                 <th class="py-3 px-3">Subject ID</th>
                 <th class="py-3 px-3">Name / Details</th>
                 <th class="py-3 px-3">Raw CIC ID Line</th>
+                <th class="py-3 px-3">Actions</th>
               </tr>
             </thead>
             <tbody id="member-table-body" class="divide-y font-mono text-xs"></tbody>
@@ -133,6 +181,31 @@
 
     <!-- 4. LOANS TAB -->
     <section id="tab-loans" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
+        <h2 class="text-lg font-bold text-slate-800 mb-4"><i class="fa-solid fa-file-circle-plus text-emerald-600 me-2"></i> Add New Loan / Credit Contract (CI Line)</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Member ID</label>
+            <input type="text" id="l-memberid" value="22038000001" class="w-full px-3 py-2 border rounded-lg text-sm font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Account Number / PN No.</label>
+            <input type="text" id="l-acctno" value="22038-42-00999-1" class="w-full px-3 py-2 border rounded-lg text-sm font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Loan Amount (PHP)</label>
+            <input type="number" id="l-amount" value="50000" class="w-full px-3 py-2 border rounded-lg text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Term (Months)</label>
+            <input type="number" id="l-term" value="12" class="w-full px-3 py-2 border rounded-lg text-sm">
+          </div>
+        </div>
+        <button onclick="addLoan()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition">
+          <i class="fa-solid fa-hand-holding-dollar me-1"></i> Add Loan Contract (CI)
+        </button>
+      </div>
+
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center justify-between">
           <span><i class="fa-solid fa-hand-holding-dollar text-emerald-600 me-2"></i> Loaded Credit Account (CI) Records</span>
@@ -146,6 +219,7 @@
                 <th class="py-3 px-3">Member ID</th>
                 <th class="py-3 px-3">Contract Type</th>
                 <th class="py-3 px-3">Raw CIC CI Line</th>
+                <th class="py-3 px-3">Actions</th>
               </tr>
             </thead>
             <tbody id="loan-table-body" class="divide-y font-mono text-xs"></tbody>
@@ -195,6 +269,8 @@
   </main>
 
   <script>
+    const ADMIN_PASSWORD = "admin123"; // Pwede nimo ilisan ang password diri kung gusto nimo
+
     let db = {
       products: [
         { id: "P1", name: "Agricultural Loan", interest: 3.0, penalty: 2.0, term: 12 }
@@ -204,131 +280,14 @@
         `ID|CO018670|22038|30092026|22038000004|10|CRISOGONO|ABAWAN|T.||||M|22111961||PH|PH||1|||||||||||||MI|2 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
         `ID|CO018670|22038|30092026|22038000011|10|RANDY|ABELLAR|GRINGIN||||M|06041984|PROSPERIDAD, ADS|PH|PH||2|||||||DIONICA FLORES GRINGIN||RODOLFO|ABELLAR|BACLAAN|SR.|MI|P-2 Lucena PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|414438851000|||||||||||||||||||||||3|09488531483||||||||||||||||||||||||||||||||||||||||||||`,
         `ID|CO018670|22038|30092026|22038000015|10|DEMOCRITO|ABLID|RIVERA||||M|18121978|ZILLOVIA, AGUSAN SUR|PH|PH||1|||||||PERLA CATABAY RIVERA||JUAN|ABLID|GARCIA||MI|P-1 Zillovia TALACOGON AGUSAN DEL SUR PH 8510||||||||||AI|P-1 TALACOGON AGUSAN DEL SUR PH 8510||||||||||10|309400920000|11|0932917300|||||||||||||||||||||3|09474223944||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000032|13|MARDJELIN|AGUIRRE|VICADA|||AGUIRRE|F|31051987|AGUSAN DEL SUR|PH|PH||2|||||||SOCRATISA FLORES MONTEJO||ENRIQUE|VICADA|TABADA||MI|P-2 STA. CRUZ Del Monte TALACOGON AGUSAN DEL SUR PH 8510||||||||||AI|P-2 STA. CRUZ STA. CRUZ TALACOGON AGUSAN DEL SUR PH 8510||||||||||10|724197948000|||||||||||||||||||||||3|09128434717||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000050|13|ALEJANDRA|ALCARIA|GANAD|||ALCARIA|F|24041963||PH|PH||1|||||||ANGELINA APOMADO BUSTAMANTE||ALEJANDRO|GANAD|SINGKO||MI|P-5 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-5 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||13|230014138167|||||||||||||||||||||||3|09103378138||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000058|10|CRISANTO|ALGUNO|BATUCAN||||M|01111979|PROSPERIDAD, ADS|PH|PH||2|||||||CARMELITA MORALES BATUCAN||DIONESIO|ALGUNO|MURILLO||MI|P-3 Santa Irene PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-3 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|717813452|||||||||||||||||||||||3|09063308720||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000068|13|MARICEL|ALINAS|||||F|21091975||PH|PH||2|||||||||||||MI|2 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000070|13|ROSALINDA|ALINAS|BORLAZA|||BORLAZA|F|27111965|LIANGA SURIGAO DEL SUR|PH|PH||2|||||||CONCHITA BEZNAR OLACO||FELIMON|BORLAZA|GALDIANO||MI|P-6 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-6 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|723250281000|||||||||||||||||||||||3|09533785192||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000084|13|JOSEPHINE|ALSULA|ROA||||F|18031973||PH|PH||2|||||||||||||MI|PUROK-3 Magsaysay PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|PUROK-3 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||||||||||||||||||||||||||3|09502174101||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000085|13|CALIXTRA|ALVAR|PANGAN|||PANGAN|F|14081963|BUTUAN CITY|PH|PH||2|||||||HONORATA BALILI BACSAN||ANECITO|PANGAN|||MI|P-1 Poblacion (Bahbah) PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-1 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|916055022|||||||||||||||||||||||3|09092463445||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000086|11|ANALYNE|AMELDA|CASTAÑEDA||||F|28011974|PROSPERIDAD, ADS|PH|PH||1|||||||MERLINDA TORREDONDO CASTAÑEDA||ANTONIO|AMELDA|FRANCO||MI|15 Poblacion (Bahbah) PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|15 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|756377035000|||||||||||||||||||||||3|09518168501||||||011||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000095|13|FLORAMIE|AMORIO|SUSPEÑE|||SUSPEÑE|F|30011974|NORTH COTABATO|PH|PH||2|||||||FE AMAR MARCELINA||ULDARICO|SUSPEÑE|MALONES||MI|P-3 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-3 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||11|0828124236|13|182006685138|||||||||||||||||||||3|09264887576|||FASRMCO|||||||001|||325|||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000097|11|RUBY|AMOY|MUNION||||F|03081966|TUBAY, AGUSAN NORTE|PH|PH||1|||||||ESTRELLA HINAYON MUNION||VICENTE|AMOY|SUBRASTAS||MI|P-3 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-3 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||13|182006685146|||||||||||||||||||||||3|09454408233|||FASRMCO|||||||001|||52|||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000107|10|JOMAR|APARES|VILLARUZ||||M|05021986|PROSPERIDAD AGUSAN DEL SUR|PH|PH||2|||||||MELAGROS QUIRAO VILLARUZ||LEONARDO|APARES|ROBLES||MI|P-1 La Union PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-1 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|720725974000|||||||||||||||||||||||3|09481179039||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000117|10|RENATO|ARCONADA|CODOY||||M|08081961|BUTUAN AGUSAN DEL SUR|PH|PH||2|||||||TRINIDAD SOTEN CODOY||ARTEMIO|ARCONADA|DEANO||MI|5 Del Monte TALACOGON AGUSAN DEL SUR PH 8510||||||||||AI|5 TALACOGON AGUSAN DEL SUR PH 8510||||||||||10|419122064000|||||||||||||||||||||||3|09105436200||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000122|13|ALICE|ARIB|J||||F|29011978||PH|PH||2|||||||||||||MI|26 Poblacion (Bahbah) PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|26 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|496908416000|||||||||||||||||||||||3|09465913331||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000136|13|TARCILA|ASIGAN|OMBID|||ASIGAN|F|15061958|CAPIZ|PH|PH||1|||||||AURORA FELIPE FRANCISCO||JESUS|OMBID|DESALES||MI|P-5 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-5 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|707327824000|||||||||||||||||||||||3|09126502119||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000152|10|COSME|AUCILA|JALINA||||M|20061946||PH|PH||2|||||||||||||MI|PUROK-4 Santa Irene PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|PUROK-4 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||||||||||||||||||||||||||3|09101506646||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000163|10|RAELDOMER|BACO|DIAMANTE||||M|24101974||PH|PH||2|||||||||||||MI|PUROK-1 La Union PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|PUROK-1 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000165|13|LEZIEL|BACSAN|BARRIGA|||BACSAN|F|11061981|PROSPERIDAD, ADS|PH|PH||2|||||||GALICANA SUPAS GERANDOY||JAIME|BARRIGA|CAPUYAN|SR.|MI|P- MANGGA Inacayan LAAK (SAN VICENTE) COMPOSTELA VALLEY PH 8810||||||||||AI|P- MANGGA LAAK (SAN VICENTE) COMPOSTELA VALLEY PH 8810||||||||||10|418467286|11|0|||||||||||||||||||||3|09219691331||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000169|13|JASMIN|BADIANG|CAGOYONG||||F|31081994||PH|PH||2|||||||||||||MI|PUROK-4 Causwagan TALACOGON AGUSAN DEL SUR PH 8510||||||||||AI|PUROK-4 TALACOGON AGUSAN DEL SUR PH 8510||||||||||10|0|11|0|||||||||||||||||||||3|09464084504||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000170|13|MARIMAR|BAGANTE|P.||||F|08011976|PROSPERIDAD AGUSAN DEL SUR|PH|PH||2|||||||||||||MI| Magsaysay PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI| PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|0|11|0|||||||||||||||||||||3|09104293969||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000171|10|PREMIE|BAGUIO|R||||M|02021977||PH|PH||1|||||||||||||MI| Lucena PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI| PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||||||||||||||||||||||||||3|09128605590||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000178|10|DANTE|BAHALLA|LORETO||||M|01051979|AURORA, PADS|PH|PH||2|||||||ROSALIA DELOBIO LORETO||MOISES|BAHALLA|ROLLON||MI|P-2 Aurora PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|721174644000|||||||||||||||||||||||3|09465380485||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000179|10|MOISES|BAHALLA|ROLLON||||M|18011950|SAN ISIDRO, BOHOL|PH|PH||1|||||||LUISA LIBESORES ROLLON||ISEDORO|BAHALLA|NAPARAN||MI|P-2 Aurora PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|158651973000|||||||||||||||||||||||3|09094175839||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000189|10|FRANCIS XEVIER|BALLONGAY|CAASI||||M|12081997|SAN FRANCISCO AGUSAN DEL SUR|PH|PH||1|||||||JENNIFER PENSOL CAASE||GEORGE|BALLONGAY|GAAN||MI|5 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|5 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||13|180501876850|||||||||||||||||||||||3|09655743747|||MSC-CEPAGCO|||||||002||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000192|10|GEORGE|BALLONGAY|GAAN||||M|06091974|BUTUAN CITY|PH|PH||2|||||||ASUNCION GERVERO GAAN||CLAUDIO|BALLONGAY|TITCHON||MI|P-5 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-5 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|198432641|||||||||||||||||||||||3|09753992720||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000195|10|CHRISANTO|BALUYO|OCOPE||||M|24031989|PANGANTUCAN,BUKIDNON|PH|PH||2|||||||ELIZABETH SANTA ANA OCOPE||ROGELIO|BALUYO|PALMARES||MI| San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI| PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|281785464|||||||||||||||||||||||3|09753116002||||||493|||||||516|||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000197|11|JOAN|BANDIOLA|LAYNO|||BANDIOLA|F|13111983|NORTH COTABATO|PH|PH||1|||||||VICTORIA RUFON LAYNO||JOAN|BANDIOLA|MAGBANUA||MI|P-2 Lucena PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|706112838000|||||||||||||||||||||||3|09079058766||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000211|13|CONSORCIA|MANULAT|LAPOT||||F|22061973||PH|PH||2|||||||||||||MI|4 Cecilia SAN LUIS AGUSAN DEL SUR PH 8511||||||||||AI|4 SAN LUIS AGUSAN DEL SUR PH 8511||||||||||10|752205975000|||||||||||||||||||||||3|09459626648||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000215|13|SUSAN|BARRIOS|DOSDOS||||F|02101969||PH|PH||2|||||||||||||MI|PUROK-3 Mapaga PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|PUROK-3 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000221|10|JERRY|BATINGANA|LAFUENTE||||M|19101989||PH|PH||1|||||||||||||MI| San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI| PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||13|182013085472|||||||||||||||||||||||3|09488492918||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000222|10|TEODOLO|BATINGANA|LIMBAG||||M|15011955|PROSPERIDAD AGUSAN DEL SUR|PH|PH||2|||||||FEDILINA LIMBAG||SEVERINO|BATINGANA|||MI|6 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|6 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|607495365000|||||||||||||||||||||||3|09120016822||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000227|13|GAVINA|BAYLOSIS|GAROL|||GAROL|F|19021958|ALEGRIA, CEBU|PH|PH||2|||||||TRINIDAD LABIANO LIREO||MIGUEL|GAROL|LENESO||MI|P-8 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-8 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||13|180251349833|||||||||||||||||||||||3|09125105633||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000232|13|JOSEPHINE|BAZAR|OSTOS|||BAZAR|F|28121968|PROSPERIDAD, ADS|PH|PH||2|||||||MEGUILLA NOJA GALDIANO||BERADO|OSTOS|NOJA||MI|P-3 Lucena PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-3 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||13|182009176676|||||||||||||||||||||||3|09309174930||||||472|||||||521|||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000233|13|NENITA|BAZAR|PABIA|||BAZAR|F|13031963|PROSPERIDAD, ADS|PH|PH||1|||||||DIOSDADA PEREZ PABIA||JULIO|BAZAR|OTACAN||MI|P-5 Lucena PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-5 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||13|182006671781|||||||||||||||||||||||3|09398768300||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000254|10|ROGELIO|BESTUDIO|TRINIDAD||||M|20051984|MAASIN SOUTHERN LEYTE|PH|PH||1|||||||MERLY LAMBAYAN TRINIDAD||ROGELIO|BESTUDIO|LUCEN|SR|MI|P-3 San Rafael PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-3 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||11|0815990525|13|180500531507|||||||||||||||||||||3|09100288245|||FARMERS ALTERNATIVE FOR SELF-RELIANCE MPC|||||||001|||833|||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000266|10|ALBERTO JR.|BONGAT|BUSTAMANTE||||M|21011987|DAVAO DEL NORTE|PH|PH||1|||||||ROSITA SAYAD BUSTAMANTE||ALBERTO|BONGAT|STANEO|SR.|MI|P-2 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|712686810000|||||||||||||||||||||||3|09357295876|||FARMERS ALTERNATIVE FOR SELF-RELIANCE MPC|||||||001||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000268|10|JUDERIM|ANOB|PATAC||||M|27101998|PROSPERIDAD AGUSAN DEL SUR|PH|PH||1|||||||MILAGROS QUIRAO VILLARUZ||LEONARDO|APARES|ROBLES||MI|1 La Union PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|1 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|720725974000|11|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000271|13|RAQUEL|BONGAY|MAGALONA||||F|03041976||PH|PH||2|||||||||||||MI| Lucena PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI| PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|705907112000|||||||||||||||||||||||3|09451287982||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000276|10|MILBERT|BORNALES|DAPUGO||||M|11091986|MA-AYON CAPIZ|PH|PH||1|||||||AMELITA COLINDRES DAPUGO||ROBERTO|BORNALES|OMBID||MI|P-6 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-6 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|422633413000|||||||||||||||||||||||3|09056029729||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000292|13|MARISSA|BUSTOS|MAGLAWAY|||MAGLAWAY|F|26081974|DAVAO CITY|PH|PH||2|||||||SOLIDAD HICAIN ARCIBAL||NICANOR|MAGLAWAY|ASOBE|SR.|MI|P-5 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-5 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|702735628000|13|182504549292|||||||||||||||||||||3|09274027217|||FARMERS ALTERNATIVE FOR SLEF-RELIANCE MPC|||||||001|||52|||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000294|10|MARLON|BUSTOS|VALENCIO||||M|19041979|PROSPERIDAD, ADS|PH|PH||2|||||||MERCELITA BATICAN VALENCIO||GUALBERTO|BUSTOS|PUGAHAN||MI|P-5 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-5 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|702734910000|||||||||||||||||||||||3|09096442335||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000298|13|JENEROSE|BUÑOL|SILVERIO|||SILVERIO|F|03121988|SAN VICENTE, PADS|PH|PH||2|||||||ERLINDA CELESTIAL DEJONGOY||NESTOR|SILVERIO|LLAPENA||MI|P-2 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|262985209|11|0419880921|||||||||||||||||||||3|09076177890||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000322|13|MERCELITA|CAGAMPANG|||||F|01091963||PH|PH||2|||||||||||||MI| Poblacion (Bahbah) PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI| PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|144656411000|||||||||||||||||||||||3|09451022358||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000329|10|LUCENO|CALAR|LIBRADILLA||||M|07081967||PH|PH||2|||||||||||||MI|PUROK-4 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|PUROK-4 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|760317334000|||||||||||||||||||||||3|09358962415||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000349|13|PERLIE|MESIONA|SON||||F|15011992||PH|PH||2|||||||||||||MI|3 Lucena PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|3 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|400761690000|||||||||||||||||||||||3|09125497003||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000368|10|ALEJANDRO|CARBON|||||M|15051970|PROSPERIDAD AGUSAN DEL SUR|PH|PH||1|||||||||||||MI| Poblacion (Bahbah) PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI| PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000374|10|LEOLAN|CARUMBA|NABATDAN||||M|14101966||PH|PH||2|||||||||||||MI| San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI| PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000378|13|ERNA|CASANTOSAN|DENOSTA|||DENOSTA|F|20081968|DUMARAO CAPIZ|PH|PH||2|||||||FLORENTINA ABELITADO PELAJIO||CESAR|DENOSTA|DULAS||MI|2 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|642146724000|||||||||||||||||||||||3|09556691900||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000387|13|ANASTACIA|CATAN|LORONO|||LORONO|F|28101972|MAKILALA, COTABATO|PH|PH||2|||||||SILVINA MEGALBIO DOMAYACA||FAUSTO|LORONO|ARANCON||MI|P-6 Del Monte TALACOGON AGUSAN DEL SUR PH 8510||||||||||AI|P-6 TALACOGON AGUSAN DEL SUR PH 8510||||||||||11|0816794568|||||||||||||||||||||||3|09122156056||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000389|10|LORENZO|CATAN|TEVES||||M|10081971|MAKILALA NORTH COTABATO|PH|PH||2|||||||HERMENIGILDA CATUBES TEVES||FELICISIMO|CATAN|YBO||MI|6 Del Monte TALACOGON AGUSAN DEL SUR PH 8510||||||||||AI|6 TALACOGON AGUSAN DEL SUR PH 8510||||||||||10|751305331000|||||||||||||||||||||||3|09654823572||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000391|13|LORENZA|CAYAMAY|DUPALCO||||F|09041973||PH|PH||2|||||||||||||MI|PUROK-17 Santa Irene PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|PUROK-17 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000403|13|CHARLENE|DEMEGILLO|CHUCAS|||CHUCAS|F|29111994|PROSPERIDAD, ADS|PH|PH||2|||||||ELVIRA SALVO CONSTANCIA||ELISEO|CHUCAS|ROSALINDA||MI|P-1 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-1 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|702439738000|13|182504365035|||||||||||||||||||||3|09154035491|||FASRMCO|||651||||002|||243|||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000413|13|EVANGELINE|COQUILLA|LOBRINO|||LOBRINO|F|15121969|COMPOSTELA VALLEY|PH|PH||2|||||||GLORIA MERCADO ACIA||MELITON|LOBRINO|CARIAGA||MI|3 Del Monte TALACOGON AGUSAN DEL SUR PH 8510||||||||||AI|3 TALACOGON AGUSAN DEL SUR PH 8510||||||||||10|724231148000|||||||||||||||||||||||3|09300582064||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000417|10|JESSIE|CORASA|HICAYAN||||M|22011976||PH|PH||1|||||||||||||MI|PUROK-2 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|PUROK-2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000432|10|CRISTOBAL|CRODUA|CAÑISARES||||M|24071966||PH|PH||2|||||||||||||MI|PUROK-7 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|PUROK-7 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||||||||||||||||||||||||||3|09468553347||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000439|13|GENALYN|COBELO|MAGALLANES||||F|18011971|LIANGA SURIGAO DEL SUR|PH|PH||2|||||||||||||MI|14 Poblacion (Bahbah) PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|14 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|769881573000|13|180250633457|||||||||||||||||||||3|09505640774||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000442|13|VIRGINIA|CUYNO|CADENAS|||CUYNO|F|26061963|BANSALAN, DAVAO SUR|PH|PH||2|||||||ELECELDA  LLAPITAN||EUSEBIO|CADENAS|CAGAS||MI|P-1 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-1 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|720015579|||||||||||||||||||||||3|09092426069||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000444|13|AMBROCIA|DAGA-ANG|LENDIO|||LENDIO|F|07121950|ALEGRIA CEBU|PH|PH||2|||||||HELARIA CARRION LOBRINO||CONSTANCIO|LENDIO|LASTIMOSO||MI|5 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|5 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|736326177000|||||||||||||||||||||||3|09125689005||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000478|11|GEMMA|DE ASIS|DAPITILLO|||DAPITILLO|F|21051966|MAAYON, CAPIZ|PH|PH||2|||||||LOLITA DECIO DONTON||BIENVINIDO|DAPITILLO|CATALAN||MI|P-3 San Rafael PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-3 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|714939847000|||||||||||||||||||||||3|09308636217|||IMC|||||||002|||53|||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000488|10|JHONNY|DELA CRUZ|M||||M|29051985||PH|PH||2|||||||||||||MI| Lucena PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI| PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000498|13|FEMELIGEN|UBA|RIGONAN||||F|23071997||PH|PH||2|||||||||||||MI|7 Del Monte TALACOGON AGUSAN DEL SUR PH 8510||||||||||AI|7 TALACOGON AGUSAN DEL SUR PH 8510||||||||||10|750271936000|||||||||||||||||||||||3|09306379625||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000508|10|FLORENCIO|DELIQUIADO|ALFEREZ|||DELIQUIADO|M|15091970|DAVAO ORIENTAL|PH|PH||2|||||||CARIDAD PASTOR ALFEREZ||BONIFACIO|DELIQUIADO|SACADAY||MI|P-7 La Union PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-7 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|724664107000|||||||||||||||||||||||3|09262253084||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000516|10|ARNEL|DEMEGILLO|BAÑAS||||M|02031969|SURALLAH SOUTH COTABATO|PH|PH||1|||||||AIDA BALBANIDA BAÑAS||ELINO|DEMEGILLO|DURUMAL||MI|1 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|1 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||||||||||||||||||||||||||3|09104055062||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000544|13|VIVIANITA|DESCAYA|BERNAL|||BERNAL|F|12021960|PROSPERIDAD AGUSAN DEL SUR|PH|PH||2|||||||FLORENCIA ASUNCION AHIT||TIBURCIO|BERNAL|PUBLICO||MI|3 San Rafael PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|3 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|764798146000|||||||||||||||||||||||3|09351562265||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|30092026|22038000549|13|LEAN|QUISTADIO|EGAY|||EGAY|F|19061978|SAN FRANCISCO AGUSAN DEL SUR|PH|PH||2|||||||EFIFANIA GALDIANO GONZALES||HERMOGENES|EGAY|ANDAG|SR|MI|7 Del Monte TALACOGON AGUSAN DEL SUR PH 8510||||||||||AI|7 TALACOGON AGUSAN DEL SUR PH 8510||||||||||10|750271554000|||||||||||||||||||||||3|09773924048||||||||||||||||||||||||||||||||||||||||||||`
+        `ID|CO018670|22038|30092026|22038000032|13|MARDJELIN|AGUIRRE|VICADA|||AGUIRRE|F|31051987|AGUSAN DEL SUR|PH|PH||2|||||||SOCRATISA FLORES MONTEJO||ENRIQUE|VICADA|TABADA||MI|P-2 STA. CRUZ Del Monte TALACOGON AGUSAN DEL SUR PH 8510||||||||||AI|P-2 STA. CRUZ STA. CRUZ TALACOGON AGUSAN DEL SUR PH 8510||||||||||10|724197948000|||||||||||||||||||||||3|09128434717||||||||||||||||||||||||||||||||||||||||||||`
       ],
       ciLines: [
         `CI|CO018670|22038|30092026|22038000001|B|22038-42-00675-1|21|AC||PHP|PHP|17082023||29042025|||||60000|1|NA||I||3000||0|||1|60000|1|60000|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
         `CI|CO018670|22038|30092026|22038000004|B|22038-44-00321-8|10|AC||PHP|PHP|31012022||01072025|||||135000|1|NA||I||3214||0|||1||1|1|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
         `CI|CO018670|22038|30092026|22038000011|B|22038-43-00658-3|10|AC||PHP|PHP|11072026||11012027|||||180000|1|NA||I||30000||0|||1|180000|0|0|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
         `CI|CO018670|22038|30092026|22038000015|B|22038-44-00227-2|10|AC||PHP|PHP|23122020||15072025|||||160333|1|NA||I||2915||0|||1|131500|1|131500|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000032|B|22038-42-00832-9|21|AC||PHP|PHP|03122024||03122025|||||40000|12|NA||M||3333||0|||10|32654|10|32654|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000050|B|22038-81-01034-3|16|AC||PHP|PHP|06022020||16072020|||||8000|23|NA||W||1600||0|||8|2513|8|2513|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000058|B|22038-43-00202-7|10|AC||PHP|PHP|27042019||10092022|||||117000|1|NA||I||2854||0|||1|27000|1|27000|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000068|B|22038-42-00001-4|21|AC||PHP|PHP|31122013||30012014|||||5000|1|NA||I||5000||0|||1|2000|1|2000|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000070|B|22038-43-00407-0|10|AC||PHP|PHP|23032021||21072026|||||57900|1|NA||I||905||0|||1|57900|1|57900|3||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000084|B|22038-43-00083-9|10|AC||PHP|PHP|03092018||22082023|||||15937|1|NA||I||270||0|||1|2100|1|2100|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000085|B|22038-42-00751-6|20|AC||PHP|PHP|03052024||30112025|||||350000|1|NA||I||19444||0|||1|350000|1|350000|5||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000085|B|22038-48-00089-6|21|AC||PHP|PHP|22102019||22102020|||||200000|12|NA||M||16667||0|||0|1|0|0|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000086|B|22038-43-00512-8|10|AC||PHP|PHP|24012023||18062025|||||150000|1|NA||I||5172||0|||1|150000|1|150000|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000095|B|22038-42-00876-0|20|AC||PHP|PHP|07102025||07102028|||||123000|36|NA||M||3417||4188|||29|95738|4|10321|4||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000097|B|22038-42-00764-6|21|AC||PHP|PHP|16052024||16052027|||||120000|36|NA||M||3333||4500|||10|30600|2|3934|2||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000107|B|22038-50-00160-7|10|AC||PHP|PHP|20042024||08022026|||||160000|1|NA||I||7273||0|||1|110000|1|110000|5||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000117|B|22038-43-00589-7|10|AC||PHP|PHP|30122024||17122026|||||105000|1|NA||I||4375||0|||1|95000|0|0|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000117|B|22038-50-00134-4|10|AC||PHP|PHP|19042024||19042029|||||288889|9|NA||Q||4815||0|||9|231111|0|0|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000122|B|22038-42-00113-3|21|AC||PHP|PHP|03052018||06122020|||||29000|6|NA||M||4833||0|||1||1|1|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000136|B|22038-81-00174-1|16|AC||PHP|PHP|12012019||22062019|||||20000|23|NA||W||4000||100|||13|10831|13|10831|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000152|B|22038-43-00113-2|10|AC||PHP|PHP|28122018||28122019|||||31000|1|NA||I||2583||0|||1|26359|1|26359|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000163|B|22038-50-00155-6|10|AC||PHP|PHP|20042024||20042028|||||260000|9|NA||Q||5417||0|||9|260000|2|57778|4||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000165|B|22038-44-00521-2|10|AC||PHP|PHP|27012025||27072025|||||135000|1|NA||I||22500||0|||0|1|0|0|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000169|B|22038-80-00017-6|16|AC||PHP|PHP|20042017||28092017|||||5000|23|NA||W||1000||0|||15|3092|15|3092|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000170|B|22038-43-00117-7|10|AC||PHP|PHP|29122018||29062019|||||27700|1|NA||I||4617||0|||1|27500|1|27500|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000171|B|22038-43-00197-0|10|AC||PHP|PHP|01032019||09062019|||||19500|1|NA||I||6500||0|||1||1|1|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000178|B|22038-43-00561-0|10|AC||PHP|PHP|20052024||30112026|||||610000|1|NA||I||20333||0|||1|285000|0|0|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000179|B|22038-48-00253-1|21|AC||PHP|PHP|14032026||14032029|||||100000|36|NA||M||2778||0|||31|83539|1|206|1||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000189|B|22038-42-00368-1|21|AC||PHP|PHP|19012021||28082025|||||186000|1|NA||I||3382||0|||1|98000|1|98000|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000192|B|22038-42-00178-6|21|AC||PHP|PHP|26122018||28082025|||||565000|1|NA||I||7063||0|||1|187000|1|187000|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000192|B|22038-44-00194-8|10|AC||PHP|PHP|11062020||28082025|||||135000|1|NA||I||2177||0|||1|135000|1|135000|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000195|B|22038-48-00191-3|21|AC||PHP|PHP|31032025||31032028|||||200000|36|NA||M||5556||1000|||26|143083|8|43083|5||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000197|B|22038-43-00253-6|10|AC||PHP|PHP|30072019||01122025|||||47000|1|NA||I||610||0|||1|44000|1|44000|5||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000211|B|22038-81-00822-0|16|AC||PHP|PHP|10102019||19032020|||||8000|23|NA||W||1600||0|||0|1|0|0|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000215|B|22038-81-00061-4|16|AC||PHP|PHP|22112018||01052019|||||12000|23|NA||W||2000||0|||8|3902|8|3902|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000221|B|22038-43-00304-1|10|AC||PHP|PHP|22052020||02052025|||||77000|1|NA||I||1283||0|||1|77000|1|77000|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000222|B|22038-42-00847-6|21|AC||PHP|PHP|11022025||11022026|||||50000|12|NA||M||4167||500|||10|41188|10|41188|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000227|B|22038-42-00784-4|21|AC||PHP|PHP|05072024||05072025|||||35000|12|NA||M||2917||0|||11|32083|11|32083|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000232|B|22038-81-01064-1|16|AC||PHP|PHP|22022020||01082020|||||6000|23|NA||W||1000||0|||19|4737|19|4737|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000233|B|22038-48-00209-8|21|AC||PHP|PHP|16062025||16062027|||||100000|24|NA||M||4167||0|||23|95833|14|58333|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000233|B|22038-50-00102-0|10|AC||PHP|PHP|12082023||12082028|||||250000|13|NA||Q||4167||0|||13|250000|5|96154|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000254|B|22038-42-00497-2|21|AC||PHP|PHP|27122021||31072025|||||245353|1|NA||I||5706||0|||1|88000|1|88000|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000266|B|22038-42-00844-5|21|AC||PHP|PHP|06022025||06022028|||||150000|36|NA||M||4167||5700|||17|65799|0|0|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000266|B|22038-43-00659-7|10|AC||PHP|PHP|18072026||18012027|||||30000|1|NA||I||5000||0|||1|30000|0|0|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000268|B|22038-80-00750-3|16|AC||PHP|PHP|28092018||08032019|||||5000|23|NA||W||833||0|||6|1186|6|1186|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000271|B|22038-81-01061-0|16|AC||PHP|PHP|20022020||30072020|||||8000|23|NA||W||1600||0|||14|4860|14|4860|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000276|B|22038-42-00289-6|21|AC||PHP|PHP|18022020||02112025|||||240000|1|NA||I||3478||0|||1|10000|1|10000|5||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000276|B|22038-44-00262-1|10|AC||PHP|PHP|13072021||02112025|||||208000|1|NA||I||4000||0|||1|23000|1|23000|5||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000276|B|22038-50-00058-0|10|AC||PHP|PHP|11042022||26112025|||||173741|1|NA||I||4040||0|||1|98259|1|98259|5||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000292|B|22038-48-00260-0|21|AC||PHP|PHP|09042026||09042029|||||80000|36|NA||M||2222||4000|||31|66434|0|0|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000294|B|22038-42-00889-0|20|AC||PHP|PHP|07102025||07102028|||||78000|36|NA||M||2167||3399|||26|54340|1|173|1||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000298|B|22038-42-00222-6|21|AC||PHP|PHP|14052019||30102026|||||48000|1|NA||I||539||0|||1|32000|0|0|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000322|B|22038-43-00225-6|10|AC||PHP|PHP|14062019||31122023|||||128000|1|NA||I||2370||0|||1|98000|1|98000|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000329|B|22038-43-00349-6|10|AC||PHP|PHP|17122020||30102025|||||200000|1|NA||I||3448||0|||1|200000|1|200000|5||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000349|B|22038-42-00767-7|21|AC||PHP|PHP|24052024||24052027|||||180000|36|NA||M||5000||0|||24|120000|16|80000|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000368|B|22038-42-00019-2|21|AC||PHP|PHP|11082003||10102003|||||5000|2|NA||M||2500||0|||0|1|0|0|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000374|B|22038-43-00254-0|10|AC||PHP|PHP|07082019||01122024|||||81000|1|NA||I||1266||0|||1|27000|1|27000|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000378|B|22038-43-00601-2|10|AC||PHP|PHP|17012025||31012026|||||60000|1|NA||I||5000||0|||1|60000|1|60000|5||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|30092026|22038000387|B|22038-42-00599-7|21|AC||PHP|PHP|05102022||18122025|||||612000|1|NA||I||16105||1222|||1||1|1|5||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`
+        `CI|CO018670|22038|30092026|22038000032|B|22038-42-00832-9|21|AC||PHP|PHP|03122024||03122025|||||40000|12|NA||M||3333||0|||10|32654|10|32654|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`
       ]
     };
 
@@ -351,6 +310,16 @@
       document.getElementById(`tab-btn-${t}`).classList.remove('text-slate-500');
     }
 
+    function verifyPassword() {
+      const pwd = prompt("Enter Admin Password to continue:");
+      if (pwd === null) return false; // Gi-cancel
+      if (pwd !== ADMIN_PASSWORD) {
+        alert("Sayop ang password! Dili mahimo kining operasyon.");
+        return false;
+      }
+      return true;
+    }
+
     function renderDashboard() {
       let installmentCount = 0;
       let nonInstallmentCount = 0;
@@ -358,7 +327,6 @@
       db.ciLines.forEach(line => {
         const parts = line.split('|');
         const term = parseInt(parts[19]) || 1;
-        // Kung ang term kay > 1 o kaya nagamit ang installment frequency (M, Q, W, etc. gawas sa I nga Single/Lump sum)
         const freq = parts[23] || '';
         if (term > 1 || freq === 'M' || freq === 'Q' || freq === 'W') {
           installmentCount++;
@@ -371,18 +339,164 @@
       document.getElementById('stat-loans').innerText = db.ciLines.length;
       document.getElementById('stat-installment').innerText = installmentCount;
       document.getElementById('stat-noninstallment').innerText = nonInstallmentCount;
-      document.getElementById('stat-total').innerText = db.idLines.length + db.ciLines.length + 2; // +HD and FT
+      document.getElementById('stat-total').innerText = db.idLines.length + db.ciLines.length + 2;
+    }
+
+    function addLoanProduct() {
+      const name = document.getElementById('p-name').value;
+      const interest = document.getElementById('p-interest').value;
+      const penalty = document.getElementById('p-penalty').value;
+      const term = document.getElementById('p-term').value;
+
+      if(!name) {
+        alert('Palihug isulat ang ngalan sa loan product.');
+        return;
+      }
+
+      db.products.push({ id: "P" + (db.products.length + 1), name, interest, penalty, term });
+      renderProducts();
+      alert('Na-save na ang bag-ong Loan Product!');
+      document.getElementById('p-name').value = '';
+    }
+
+    function editProduct(index) {
+      if (!verifyPassword()) return;
+      const p = db.products[index];
+      const newName = prompt("Bag-ong Ngalan sa Product:", p.name);
+      if (newName === null) return;
+      const newInt = prompt("Bag-ong Interest (%):", p.interest);
+      if (newInt === null) return;
+
+      p.name = newName;
+      p.interest = newInt;
+      renderProducts();
+      alert("Na-update na ang Loan Product!");
+    }
+
+    function deleteProduct(index) {
+      if (!verifyPassword()) return;
+      if (confirm("Sigurado ka ba nga i-delete kining loan product?")) {
+        db.products.splice(index, 1);
+        renderProducts();
+        alert("Na-delete na ang produkto.");
+      }
+    }
+
+    function addMember() {
+      const mId = document.getElementById('m-id').value;
+      const fname = document.getElementById('m-fname').value.toUpperCase();
+      const lname = document.getElementById('m-lname').value.toUpperCase();
+
+      if(!mId || !fname || !lname) {
+        alert('Palihug i-fill up ang tanang natad (Subject ID, First Name, Last Name).');
+        return;
+      }
+
+      const newLine = `ID|CO018670|22038|30092026|${mId}|13|${fname}||${lname}||||F|01011990||PH|PH||2|||||||||||||MI|PROSPERIDAD AGUSAN DEL SUR PH 8500||||||||||AI|PROSPERIDAD AGUSAN DEL SUR PH 8500||||||||||10|123456789|||||||||||||||||||||||3|09123456789||||||||||||||||||||||||||||||||||||||||||||`;
+      db.idLines.push(newLine);
+      renderMembers();
+      renderDashboard();
+      previewReport();
+      alert('Na-add na ang bag-ong Member ID!');
+      document.getElementById('m-fname').value = '';
+      document.getElementById('m-lname').value = '';
+    }
+
+    function editMember(index) {
+      if (!verifyPassword()) return;
+      const currentLine = db.idLines[index];
+      const parts = currentLine.split('|');
+      const newFname = prompt("Usba ang First Name:", parts[6]);
+      if (newFname === null) return;
+      const newLname = prompt("Usba ang Last Name:", parts[8]);
+      if (newLname === null) return;
+
+      parts[6] = newFname.toUpperCase();
+      parts[8] = newLname.toUpperCase();
+      db.idLines[index] = parts.join('|');
+      
+      renderMembers();
+      renderDashboard();
+      previewReport();
+      alert("Na-update na ang Member ID record!");
+    }
+
+    function deleteMember(index) {
+      if (!verifyPassword()) return;
+      if (confirm("Sigurado ka ba nga i-delete kining Member ID?")) {
+        db.idLines.splice(index, 1);
+        renderMembers();
+        renderDashboard();
+        previewReport();
+        alert("Na-delete na ang Member ID.");
+      }
+    }
+
+    function addLoan() {
+      const memberId = document.getElementById('l-memberid').value;
+      const acctNo = document.getElementById('l-acctno').value;
+      const amount = document.getElementById('l-amount').value;
+      const term = parseInt(document.getElementById('l-term').value) || 1;
+
+      if(!memberId || !acctNo || !amount) {
+        alert('Palihug i-fill up ang tanang detalye sa loan.');
+        return;
+      }
+
+      const freq = term > 1 ? 'M' : 'I';
+      const newCiLine = `CI|CO018670|22038|30092026|${memberId}|B|${acctNo}|21|AC||PHP|PHP|01012025||01012026|||||${amount}|${term}|NA||${freq}||3000||0|||1|${amount}|1|${amount}|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`;
+      
+      db.ciLines.push(newCiLine);
+      renderLoans();
+      renderDashboard();
+      previewReport();
+      alert('Na-add na ang bag-ong Loan Contract (CI)!');
+    }
+
+    function editLoan(index) {
+      if (!verifyPassword()) return;
+      const currentLine = db.ciLines[index];
+      const parts = currentLine.split('|');
+      const newAmount = prompt("Usba ang Loan Amount (PHP):", parts[18]);
+      if (newAmount === null) return;
+      const newTerm = prompt("Usba ang Term (Months):", parts[19]);
+      if (newTerm === null) return;
+
+      parts[18] = newAmount;
+      parts[19] = newTerm;
+      parts[23] = parseInt(newTerm) > 1 ? 'M' : 'I';
+      db.ciLines[index] = parts.join('|');
+
+      renderLoans();
+      renderDashboard();
+      previewReport();
+      alert("Na-update na ang Credit Contract record!");
+    }
+
+    function deleteLoan(index) {
+      if (!verifyPassword()) return;
+      if (confirm("Sigurado ka ba nga i-delete kining Credit Record (CI)?")) {
+        db.ciLines.splice(index, 1);
+        renderLoans();
+        renderDashboard();
+        previewReport();
+        alert("Na-delete na ang Loan Contract.");
+      }
     }
 
     function renderProducts() {
       const tbody = document.getElementById('product-table-body');
       tbody.innerHTML = '';
-      db.products.forEach((p) => {
+      db.products.forEach((p, index) => {
         tbody.innerHTML += `<tr>
           <td class="py-3 px-3 font-semibold">${p.name}</td>
           <td class="py-3 px-3">${p.interest}%</td>
           <td class="py-3 px-3">${p.penalty}%</td>
           <td class="py-3 px-3">${p.term} Months</td>
+          <td class="py-3 px-3 space-x-2">
+            <button onclick="editProduct(${index})" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded text-xs"><i class="fa-solid fa-pen"></i> Edit</button>
+            <button onclick="deleteProduct(${index})" class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i> Delete</button>
+          </td>
         </tr>`;
       });
     }
@@ -391,7 +505,7 @@
       const tbody = document.getElementById('member-table-body');
       tbody.innerHTML = '';
       document.getElementById('member-count-badge').innerText = db.idLines.length;
-      db.idLines.forEach((line) => {
+      db.idLines.forEach((line, index) => {
         const parts = line.split('|');
         const memberId = parts[4] || 'N/A';
         const fname = parts[6] || '';
@@ -400,6 +514,10 @@
           <td class="py-3 px-3 font-semibold text-blue-600">${memberId}</td>
           <td class="py-3 px-3 font-sans font-medium text-slate-700">${fname} ${lname}</td>
           <td class="py-3 px-3 text-slate-500 truncate max-w-xs" title="${line}">${line}</td>
+          <td class="py-3 px-3 space-x-2 whitespace-nowrap">
+            <button onclick="editMember(${index})" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded text-xs"><i class="fa-solid fa-pen"></i> Edit</button>
+            <button onclick="deleteMember(${index})" class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i> Delete</button>
+          </td>
         </tr>`;
       });
     }
@@ -408,7 +526,7 @@
       const tbody = document.getElementById('loan-table-body');
       tbody.innerHTML = '';
       document.getElementById('loan-count-badge').innerText = db.ciLines.length;
-      db.ciLines.forEach((line) => {
+      db.ciLines.forEach((line, index) => {
         const parts = line.split('|');
         const memberId = parts[4] || 'N/A';
         const loanId = parts[6] || 'N/A';
@@ -420,6 +538,10 @@
           <td class="py-3 px-3 font-semibold">${memberId}</td>
           <td class="py-3 px-3">${contractType}</td>
           <td class="py-3 px-3 text-slate-500 truncate max-w-xs" title="${line}">${line}</td>
+          <td class="py-3 px-3 space-x-2 whitespace-nowrap">
+            <button onclick="editLoan(${index})" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded text-xs"><i class="fa-solid fa-pen"></i> Edit</button>
+            <button onclick="deleteLoan(${index})" class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i> Delete</button>
+          </td>
         </tr>`;
       });
     }
