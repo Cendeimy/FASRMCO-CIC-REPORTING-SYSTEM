@@ -363,7 +363,7 @@
     const firebaseConfig = {
       apiKey: "AIzaSyA3dfJd0zcNarpSSik8ZnaNRYBMTBBf_Bo",
       authDomain: "fasrcmo-cic-report.firebaseapp.com",
-      databaseURL: "https://fasrcmo-cic-report-default-rtdb.firebaseio.com",
+      databaseURL: "https://fasrcmo-cic-report-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "fasrcmo-cic-report",
       storageBucket: "fasrcmo-cic-report.firebasestorage.app",
       messagingSenderId: "581267722260",
@@ -410,12 +410,10 @@
           db.idLines = cloudData.idLines || [];
           db.ciLines = cloudData.ciLines || [];
         } else {
-          // Kung empty pa ang database, i-initialize gamit ang default data
           rdb.ref('cic_system').set(defaultData);
           db = defaultData;
         }
 
-        // Refresh UI
         renderDashboard();
         renderProducts();
         renderMembers();
@@ -545,18 +543,39 @@
       }
     }
 
-    // --- BORROWERS / MEMBERS FUNCTIONS ---
+    // --- BORROWERS / MEMBERS FUNCTIONS (WITH DUPLICATE CHECKING) ---
     function saveBorrower(event) {
       event.preventDefault();
       const editIndex = parseInt(document.getElementById('b-edit-index').value);
-      const subjectId = document.getElementById('b-subjectid').value;
-      const fname = document.getElementById('b-fname').value.toUpperCase();
-      const mname = document.getElementById('b-mname').value.toUpperCase();
-      const lname = document.getElementById('b-lname').value.toUpperCase();
+      const subjectId = document.getElementById('b-subjectid').value.trim();
+      const fname = document.getElementById('b-fname').value.toUpperCase().trim();
+      const mname = document.getElementById('b-mname').value.toUpperCase().trim();
+      const lname = document.getElementById('b-lname').value.toUpperCase().trim();
       const gender = document.getElementById('b-gender').value;
-      const bdate = document.getElementById('b-bdate').value;
-      const contact = document.getElementById('b-contact').value;
-      const address = document.getElementById('b-address').value.toUpperCase();
+      const bdate = document.getElementById('b-bdate').value.trim();
+      const contact = document.getElementById('b-contact').value.trim();
+      const address = document.getElementById('b-address').value.toUpperCase().trim();
+
+      // DUPLICATE CHECKING (Kung bag-ong rehistro pa lang)
+      if (editIndex === -1) {
+        for (let i = 0; i < db.idLines.length; i++) {
+          const parts = db.idLines[i].split('|');
+          const existingId = parts[4];
+          const existingFname = parts[6];
+          const existingLname = parts[8];
+          const existingMname = parts[9] || '';
+
+          if (existingId === subjectId) {
+            alert(`Hulata! Ang Subject ID nga "${subjectId}" anaa na sa sistema. Dili pwede mag-double.`);
+            return;
+          }
+
+          if (existingFname === fname && existingLname === lname && existingMname === mname) {
+            alert(`Hulata! Ang pangalan nga "${fname} ${mname} ${lname}" narehistro na daan sa sistema.`);
+            return;
+          }
+        }
+      }
 
       const provider = document.getElementById('r-provider').value;
       const branch = document.getElementById('r-branch').value;
@@ -771,7 +790,7 @@
     function downloadReportFile() {
       const content = buildPipeReport();
       const filename = `${document.getElementById('r-provider').value}_CSDF_${document.getElementById('r-asofdate').value}.txt`;
-      const blob = new Blob([content], { type: 'text/plain;charset=utf-8'>>(0) });
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = filename;
