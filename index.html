@@ -206,8 +206,9 @@
         <div class="space-y-6 lg:col-span-1">
           <!-- Borrow Loan Form -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-            <h2 class="text-lg font-bold text-slate-800 mb-3"><i class="fa-solid fa-hand-holding-dollar text-blue-600 me-2"></i>Borrower Loan Application</h2>
+            <h2 class="text-lg font-bold text-slate-800 mb-3" id="loan-form-title"><i class="fa-solid fa-hand-holding-dollar text-blue-600 me-2"></i>Borrower Loan Application</h2>
             <form id="loanAppForm" onsubmit="applyLoan(event)" class="space-y-3 text-sm">
+              <input type="hidden" id="loan-edit-index" value="-1">
               <div>
                 <label class="block font-semibold text-slate-600 mb-1">Account No. (Manual)</label>
                 <input type="text" id="loan-accno" required placeholder="22038-42-00675-1" class="w-full px-3 py-2 border rounded-lg font-mono text-xs outline-none">
@@ -229,11 +230,11 @@
               <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-lg border">
                 <div>
                   <label class="block font-semibold text-slate-600 mb-1 text-xs">Interest Rate (%)</label>
-                  <input type="number" step="0.1" id="loan-interest" required placeholder="3.0" class="w-full px-2 py-1.5 border rounded bg-white text-xs font-bold text-blue-600 outline-none">
+                  <input type="number" step="0.1" id="loan-interest" placeholder="3.0" class="w-full px-2 py-1.5 border rounded bg-white text-xs font-bold text-blue-600 outline-none">
                 </div>
                 <div>
                   <label class="block font-semibold text-slate-600 mb-1 text-xs">Penalty Rate (%)</label>
-                  <input type="number" step="0.1" id="loan-penalty" required placeholder="2.0" class="w-full px-2 py-1.5 border rounded bg-white text-xs font-bold text-amber-600 outline-none">
+                  <input type="number" step="0.1" id="loan-penalty" placeholder="2.0" class="w-full px-2 py-1.5 border rounded bg-white text-xs font-bold text-amber-600 outline-none">
                 </div>
               </div>
 
@@ -277,7 +278,10 @@
                   <option value="W">Weekly (W)</option>
                 </select>
               </div>
-              <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg shadow transition">Approve & Generate CI Account</button>
+              <div class="flex space-x-2">
+                <button type="submit" id="loan-submit-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg shadow transition">Approve & Save Credit Account</button>
+                <button type="button" onclick="resetLoanForm()" id="loan-cancel-btn" class="hidden bg-slate-300 hover:bg-slate-400 text-slate-700 font-semibold py-2.5 px-3 rounded-lg transition">Cancel</button>
+              </div>
             </form>
           </div>
 
@@ -319,7 +323,7 @@
                   <th class="py-3 px-3">Member ID</th>
                   <th class="py-3 px-3">Type</th>
                   <th class="py-3 px-3">Raw CIC CI Line</th>
-                  <th class="py-3 px-3 text-right">Action</th>
+                  <th class="py-3 px-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody id="loan-table-body" class="divide-y font-mono text-xs"></tbody>
@@ -693,14 +697,13 @@
 
     function applyLoan(event) {
       event.preventDefault();
-      const accountNo = document.getElementById('loan-accno').value;
+      const editIndex = parseInt(document.getElementById('loan-edit-index').value);
+      const accountNo = document.getElementById('loan-accno').value.trim();
       const borrowerId = document.getElementById('loan-borrower').value;
       const amount = parseFloat(document.getElementById('loan-amount').value);
       const term = parseInt(document.getElementById('loan-term').value);
       const disbDate = document.getElementById('loan-disbdate').value.trim();
       const matDate = document.getElementById('loan-matdate').value.trim();
-      const interest = parseFloat(document.getElementById('loan-interest').value);
-      const penalty = parseFloat(document.getElementById('loan-penalty').value);
       const monthlyPayment = parseFloat(document.getElementById('loan-monthly').value);
       const remainingBalance = parseFloat(document.getElementById('loan-balance').value);
       const freq = document.getElementById('loan-freq').value;
@@ -713,18 +716,53 @@
 
       let ciLine = `CI|${provider}|${branch}|${asOfDate}|${borrowerId}|B|${accountNo}|21|AC||PHP|PHP|${disbDate}||${matDate}|||||${amount}|${term}|NA||${installmentIndicator}||${monthlyPayment}||0|||1|${amount}|1|${remainingBalance}|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`;
 
-      db.ciLines.push(ciLine);
+      if (editIndex === -1) {
+        db.ciLines.push(ciLine);
+        alert(`Malampusong na-aprubahan ang pautang! Account No: ${accountNo}`);
+      } else {
+        db.ciLines[editIndex] = ciLine;
+        alert(`Malampusong na-update ang Credit Account ${accountNo}!`);
+        resetLoanForm();
+      }
+
       saveToCloud();
       document.getElementById('loanAppForm').reset();
       setDefaultAccountNo();
-      alert(`Malampusong na-aprubahan ang pautang! Account No: ${accountNo} (Balance: ₱${remainingBalance})`);
+    }
+
+    function editLoan(idx) {
+      const line = db.ciLines[idx];
+      const parts = line.split('|');
+      
+      document.getElementById('loan-edit-index').value = idx;
+      document.getElementById('loan-accno').value = parts[6] || '';
+      document.getElementById('loan-borrower').value = parts[4] || '';
+      document.getElementById('loan-disbdate').value = parts[12] || '';
+      document.getElementById('loan-matdate').value = parts[14] || '';
+      document.getElementById('loan-amount').value = parts[19] || '';
+      document.getElementById('loan-term').value = parts[20] || '';
+      document.getElementById('loan-monthly').value = parts[24] || '';
+      document.getElementById('loan-balance').value = parts[33] || '';
+      document.getElementById('loan-freq').value = parts[22] || 'M';
+
+      document.getElementById('loan-form-title').innerHTML = `<i class="fa-solid fa-pen-to-square text-blue-600 me-2"></i>Edit Credit Account (CI)`;
+      document.getElementById('loan-submit-btn').innerText = "Update Credit Account";
+      document.getElementById('loan-cancel-btn').classList.remove('hidden');
+    }
+
+    function resetLoanForm() {
+      document.getElementById('loanAppForm').reset();
+      document.getElementById('loan-edit-index').value = -1;
+      document.getElementById('loan-form-title').innerHTML = `<i class="fa-solid fa-hand-holding-dollar text-blue-600 me-2"></i>Borrower Loan Application`;
+      document.getElementById('loan-submit-btn').innerText = "Approve & Save Credit Account";
+      document.getElementById('loan-cancel-btn').classList.add('hidden');
+      setDefaultAccountNo();
     }
 
     function recordPayment(event) {
       event.preventDefault();
       const accountNo = document.getElementById('pay-account').value;
       const payAmount = parseFloat(document.getElementById('pay-amount').value);
-      const date = document.getElementById('pay-date').value;
 
       let found = false;
       for (let i = 0; i < db.ciLines.length; i++) {
@@ -766,8 +804,9 @@
           <td class="py-3 px-3 font-semibold">${memberId}</td>
           <td class="py-3 px-3">${typeBadge}</td>
           <td class="py-3 px-3 text-slate-500 truncate max-w-xs" title="${line}">${line}</td>
-          <td class="py-3 px-3 text-right">
-            <button onclick="deleteLoan(${idx})" class="text-red-600 hover:text-red-800" title="Delete"><i class="fa-solid fa-trash"></i></button>
+          <td class="py-3 px-3 text-right space-x-2">
+            <button onclick="editLoan(${idx})" class="text-blue-600 hover:text-blue-800" title="Edit Loan"><i class="fa-solid fa-pen-to-square"></i></button>
+            <button onclick="deleteLoan(${idx})" class="text-red-600 hover:text-red-800" title="Delete Loan"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>`;
       });
