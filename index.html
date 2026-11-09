@@ -247,6 +247,19 @@
                   <input type="number" id="loan-term" required placeholder="12" class="w-full px-3 py-2 border rounded-lg outline-none text-sm">
                 </div>
               </div>
+
+              <!-- Disbursement Date & Maturity Date Fields -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-semibold text-slate-600 mb-1 text-xs">Disbursement Date</label>
+                  <input type="text" id="loan-disbdate" required placeholder="17082023" class="w-full px-2 py-1.5 border rounded text-xs font-mono outline-none">
+                </div>
+                <div>
+                  <label class="block font-semibold text-slate-600 mb-1 text-xs">Maturity Date</label>
+                  <input type="text" id="loan-matdate" required placeholder="29042025" class="w-full px-2 py-1.5 border rounded text-xs font-mono outline-none">
+                </div>
+              </div>
+
               <div>
                 <label class="block font-semibold text-slate-600 mb-1">Monthly Payment Amount</label>
                 <input type="number" step="0.01" id="loan-monthly" required placeholder="4500.00" class="w-full px-3 py-2 border rounded-lg outline-none text-sm text-blue-600 font-semibold">
@@ -684,6 +697,8 @@
       const borrowerId = document.getElementById('loan-borrower').value;
       const amount = parseFloat(document.getElementById('loan-amount').value);
       const term = parseInt(document.getElementById('loan-term').value);
+      const disbDate = document.getElementById('loan-disbdate').value.trim();
+      const matDate = document.getElementById('loan-matdate').value.trim();
       const interest = parseFloat(document.getElementById('loan-interest').value);
       const penalty = parseFloat(document.getElementById('loan-penalty').value);
       const monthlyPayment = parseFloat(document.getElementById('loan-monthly').value);
@@ -696,7 +711,7 @@
 
       const installmentIndicator = freq === 'I' ? 'I' : 'M';
 
-      let ciLine = `CI|${provider}|${branch}|${asOfDate}|${borrowerId}|B|${accountNo}|21|AC||PHP|PHP|01012026||30092028|||||${amount}|${term}|NA||${installmentIndicator}||${monthlyPayment}||0|||1|${amount}|1|${remainingBalance}|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`;
+      let ciLine = `CI|${provider}|${branch}|${asOfDate}|${borrowerId}|B|${accountNo}|21|AC||PHP|PHP|${disbDate}||${matDate}|||||${amount}|${term}|NA||${installmentIndicator}||${monthlyPayment}||0|||1|${amount}|1|${remainingBalance}|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`;
 
       db.ciLines.push(ciLine);
       saveToCloud();
