@@ -1,1 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIC Loan & Monthly Text Report System (Firebase Cloud)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Firebase SDKs (Compat Version para sa sayon nga Single-File setup) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; font-weight: 600; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
+  <!-- Header -->
+  <header class="bg-blue-900 text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center">
+      <div class="flex items-center space-x-3 mb-4 md:mb-0">
+        <i class="fa-solid fa-cloud text-yellow-400 text-2xl"></i>
+        <div>
+          <h1 class="text-xl font-bold leading-tight">CIC Loan Management System (Cloud Connected)</h1>
+          <p class="text-xs text-blue-200">Real-time Firebase Sync & Automated .TXT Generator</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-4 text-sm bg-blue-800 px-4 py-2 rounded-lg">
+        <div><span class="text-blue-300">Provider:</span> <strong>CO018670</strong></div>
+        <div class="border-l border-blue-700 h-4"></div>
+        <div><span class="text-blue-300">Branch:</span> <strong>22038</strong></div>
+        <div class="border-l border-blue-700 h-4"></div>
+        <div id="sync-status" class="text-amber-300 text-xs flex items-center"><i class="fa-solid fa-spinner fa-spin me-1"></i>Connecting...</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <div class="bg-white border-b shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 flex space-x-8 overflow-x-auto">
+      <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="py-4 px-2 tab-active flex items-center space-x-2 whitespace-nowrap">
+        <i class="fa-solid fa-chart-line"></i><span>Dashboard</span>
+      </button>
+      <button onclick="switchTab('products')" id="tab-btn-products" class="py-4 px-2 text-slate-500 hover:text-blue-600 flex items-center space-x-2 whitespace-nowrap">
+        <i class="fa-solid fa-boxes-packing"></i><span>Loan Programs</span>
+      </button>
+      <button onclick="switchTab('members')" id="tab-btn-members" class="py-4 px-2 text-slate-500 hover:text-blue-600 flex items-center space-x-2 whitespace-nowrap">
+        <i class="fa-solid fa-users"></i><span>Borrowers (IDs)</span>
+      </button>
+      <button onclick="switchTab('loans')" id="tab-btn-loans" class="py-4 px-2 text-slate-500 hover:text-blue-600 flex items-center space-x-2 whitespace-nowrap">
+        <i class="fa-solid fa-hand-holding-dollar"></i><span>Loans & Payments</span>
+      </button>
+      <button onclick="switchTab('reports')" id="tab-btn-reports" class="py-4 px-2 text-slate-500 hover:text-blue-600 flex items-center space-x-2 whitespace-nowrap">
+        <i class="fa-solid fa-file-export"></i><span>Generate CIC Report</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-6 py-8">
+
+    <!-- 1. DASHBOARD TAB -->
+    <section id="tab-dashboard" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <div class="text-slate-500 text-sm font-medium">Registered Borrowers (IDs)</div>
+          <div class="text-3xl font-bold text-slate-800 mt-2" id="stat-members">0</div>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <div class="text-slate-500 text-sm font-medium">Installment Loans</div>
+          <div class="text-3xl font-bold text-blue-600 mt-2" id="stat-installment">0</div>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <div class="text-slate-500 text-sm font-medium">Non-Installment Loans</div>
+          <div class="text-3xl font-bold text-amber-600 mt-2" id="stat-noninstallment">0</div>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <div class="text-slate-500 text-sm font-medium">Total Credit Accounts (CIs)</div>
+          <div class="text-3xl font-bold text-emerald-600 mt-2" id="stat-loans">0</div>
+        </div>
+      </div>
+      
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h3 class="text-md font-bold text-slate-800 mb-2"><i class="fa-solid fa-circle-info text-blue-600 me-2"></i>Cloud Firebase Connected</h3>
+        <p class="text-sm text-slate-600">This dashboard summarizes your live cloud database records. Any entries made on other devices connected to this Firebase project will automatically sync here in real-time.</p>
+      </div>
+    </section>
+
+    <!-- 2. LOAN PRODUCTS TAB -->
+    <section id="tab-products" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-1">
+          <h2 class="text-lg font-bold text-slate-800 mb-4" id="product-form-title"><i class="fa-solid fa-circle-plus text-blue-600 me-2"></i>Add Loan Program</h2>
+          <form id="productForm" onsubmit="saveLoanProduct(event)" class="space-y-4 text-sm">
+            <input type="hidden" id="p-edit-index" value="-1">
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Program Name</label>
+              <input type="text" id="p-name" required placeholder="e.g. Provident Loan" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <div class="flex space-x-2">
+              <button type="submit" id="product-submit-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg shadow transition">Save Loan Program</button>
+              <button type="button" onclick="resetProductForm()" id="product-cancel-btn" class="hidden bg-slate-300 hover:bg-slate-400 text-slate-700 font-semibold py-2.5 px-3 rounded-lg transition">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
+          <h2 class="text-lg font-bold text-slate-800 mb-4">Available Loan Programs List</h2>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-xs border-b">
+                <tr>
+                  <th class="py-3 px-3">ID / Code</th>
+                  <th class="py-3 px-3">Program Name</th>
+                  <th class="py-3 px-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="product-table-body" class="divide-y"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. MEMBERS / BORROWERS TAB -->
+    <section id="tab-members" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-1">
+          <h2 class="text-lg font-bold text-slate-800 mb-4" id="borrower-form-title"><i class="fa-solid fa-user-plus text-blue-600 me-2"></i>Register Borrower (CIC)</h2>
+          <form id="borrowerForm" onsubmit="saveBorrower(event)" class="space-y-3 text-sm">
+            <input type="hidden" id="b-edit-index" value="-1">
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Subject ID (CIC Standard)</label>
+              <input type="text" id="b-subjectid" required placeholder="22038000055" class="w-full px-3 py-2 border rounded-lg font-mono outline-none">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">First Name</label>
+              <input type="text" id="b-fname" required placeholder="JUAN" class="w-full px-3 py-2 border rounded-lg uppercase outline-none">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Middle Name</label>
+              <input type="text" id="b-mname" placeholder="SANTOS" class="w-full px-3 py-2 border rounded-lg uppercase outline-none">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Last Name</label>
+              <input type="text" id="b-lname" required placeholder="DELA CRUZ" class="w-full px-3 py-2 border rounded-lg uppercase outline-none">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Gender</label>
+                <select id="b-gender" class="w-full px-3 py-2 border rounded-lg outline-none">
+                  <option value="M">Male</option>
+                  <option value="F">Female</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Birthdate (DDMMYYYY)</label>
+                <input type="text" id="b-bdate" required placeholder="15081985" class="w-full px-3 py-2 border rounded-lg outline-none">
+              </div>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Contact Number</label>
+              <input type="text" id="b-contact" placeholder="09123456789" class="w-full px-3 py-2 border rounded-lg outline-none">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Address / Purok / Barangay</label>
+              <input type="text" id="b-address" required placeholder="San Vicente PROSPERIDAD AGUSAN DEL SUR" class="w-full px-3 py-2 border rounded-lg uppercase outline-none">
+            </div>
+            <div class="flex space-x-2">
+              <button type="submit" id="borrower-submit-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg shadow transition">Save Borrower ID</button>
+              <button type="button" onclick="resetBorrowerForm()" id="borrower-cancel-btn" class="hidden bg-slate-300 hover:bg-slate-400 text-slate-700 font-semibold py-2.5 px-3 rounded-lg transition">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
+          <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center justify-between">
+            <span><i class="fa-solid fa-users text-blue-600 me-2"></i> Registered Borrower Records (CIC Standard)</span>
+            <span class="text-xs text-slate-500 font-normal">Total: <strong id="member-count-badge">0</strong></span>
+          </h2>
+          <div class="overflow-x-auto max-h-[500px]">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-xs border-b sticky top-0">
+                <tr>
+                  <th class="py-3 px-3">Subject ID</th>
+                  <th class="py-3 px-3">Name / Details</th>
+                  <th class="py-3 px-3">Raw CIC ID Line</th>
+                  <th class="py-3 px-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="member-table-body" class="divide-y font-mono text-xs"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. LOANS & PAYMENTS TAB -->
+    <section id="tab-loans" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left column: Borrow Loan / Apply Loan & Payments -->
+        <div class="space-y-6 lg:col-span-1">
+          <!-- Borrow Loan Form -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <h2 class="text-lg font-bold text-slate-800 mb-3"><i class="fa-solid fa-hand-holding-dollar text-blue-600 me-2"></i>Borrower Loan Application</h2>
+            <form id="loanAppForm" onsubmit="applyLoan(event)" class="space-y-3 text-sm">
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Account No. (Manual)</label>
+                <input type="text" id="loan-accno" required placeholder="22038-42-00675-1" class="w-full px-3 py-2 border rounded-lg font-mono text-xs outline-none">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Select Borrower</label>
+                <select id="loan-borrower" required class="w-full px-3 py-2 border rounded-lg outline-none text-xs font-mono">
+                  <!-- Dynamically populated -->
+                </select>
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Select Loan Program</label>
+                <select id="loan-program" required class="w-full px-3 py-2 border rounded-lg outline-none text-xs">
+                  <!-- Dynamically populated -->
+                </select>
+              </div>
+
+              <!-- Manual Interest & Penalty Input Fields -->
+              <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-lg border">
+                <div>
+                  <label class="block font-semibold text-slate-600 mb-1 text-xs">Interest Rate (%)</label>
+                  <input type="number" step="0.1" id="loan-interest" required placeholder="3.0" class="w-full px-2 py-1.5 border rounded bg-white text-xs font-bold text-blue-600 outline-none">
+                </div>
+                <div>
+                  <label class="block font-semibold text-slate-600 mb-1 text-xs">Penalty Rate (%)</label>
+                  <input type="number" step="0.1" id="loan-penalty" required placeholder="2.0" class="w-full px-2 py-1.5 border rounded bg-white text-xs font-bold text-amber-600 outline-none">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-semibold text-slate-600 mb-1">Loan Amount</label>
+                  <input type="number" step="0.01" id="loan-amount" required placeholder="50000" class="w-full px-3 py-2 border rounded-lg outline-none text-sm">
+                </div>
+                <div>
+                  <label class="block font-semibold text-slate-600 mb-1">Term (Months)</label>
+                  <input type="number" id="loan-term" required placeholder="12" class="w-full px-3 py-2 border rounded-lg outline-none text-sm">
+                </div>
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Monthly Payment Amount</label>
+                <input type="number" step="0.01" id="loan-monthly" required placeholder="4500.00" class="w-full px-3 py-2 border rounded-lg outline-none text-sm text-blue-600 font-semibold">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Remaining Balance (Outstanding)</label>
+                <input type="number" step="0.01" id="loan-balance" required placeholder="50000.00" class="w-full px-3 py-2 border rounded-lg outline-none text-sm text-emerald-600 font-semibold">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Payment Frequency</label>
+                <select id="loan-freq" class="w-full px-3 py-2 border rounded-lg outline-none text-xs">
+                  <option value="M">Monthly (M)</option>
+                  <option value="I">Installment-Free / Single (I)</option>
+                  <option value="Q">Quarterly (Q)</option>
+                  <option value="W">Weekly (W)</option>
+                </select>
+              </div>
+              <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg shadow transition">Approve & Generate CI Account</button>
+            </form>
+          </div>
+
+          <!-- Record Payment Form -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <h2 class="text-lg font-bold text-slate-800 mb-3"><i class="fa-solid fa-money-bill-wave text-emerald-600 me-2"></i>Record Payment</h2>
+            <form id="paymentForm" onsubmit="recordPayment(event)" class="space-y-3 text-sm">
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Select Credit Account (CI)</label>
+                <select id="pay-account" required class="w-full px-3 py-2 border rounded-lg font-mono text-xs outline-none">
+                  <!-- Dynamically populated -->
+                </select>
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Payment Amount (PHP)</label>
+                <input type="number" step="0.01" id="pay-amount" required placeholder="5000.00" class="w-full px-3 py-2 border rounded-lg outline-none">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Payment Date (DDMMYYYY)</label>
+                <input type="text" id="pay-date" required value="30092026" class="w-full px-3 py-2 border rounded-lg outline-none">
+              </div>
+              <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg shadow transition">Save & Apply Payment</button>
+            </form>
+            <div id="payment-feedback" class="mt-3 text-xs font-semibold text-emerald-600"></div>
+          </div>
+        </div>
+
+        <!-- Right column: Loaded Credit Accounts (CIs) -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
+          <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center justify-between">
+            <span><i class="fa-solid fa-hand-holding-dollar text-emerald-600 me-2"></i> Loaded Credit Account (CI) Records</span>
+            <span class="text-xs text-slate-500 font-normal">Total Accounts: <strong id="loan-count-badge">0</strong></span>
+          </h2>
+          <div class="overflow-x-auto max-h-[600px]">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-xs border-b sticky top-0">
+                <tr>
+                  <th class="py-3 px-3">Account No.</th>
+                  <th class="py-3 px-3">Member ID</th>
+                  <th class="py-3 px-3">Type</th>
+                  <th class="py-3 px-3">Raw CIC CI Line</th>
+                  <th class="py-3 px-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="loan-table-body" class="divide-y font-mono text-xs"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. GENERATE REPORT TAB -->
+    <section id="tab-reports" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 max-w-5xl mx-auto">
+        <h2 class="text-xl font-bold text-slate-800 mb-2 flex items-center">
+          <i class="fa-solid fa-file-export text-blue-600 me-2"></i> Monthly CIC Report Generator
+        </h2>
+        <p class="text-sm text-slate-500 mb-6">Generates exact format matching your official CIC CSDF file structure with ID and CI records from Firebase.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">PROVIDER CODE</label>
+            <input type="text" id="r-provider" value="CO018670" class="w-full px-3 py-2 border rounded-lg text-sm font-semibold text-slate-700">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">BRANCH CODE</label>
+            <input type="text" id="r-branch" value="22038" class="w-full px-3 py-2 border rounded-lg text-sm font-semibold text-slate-700">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">AS OF DATE (DDMMYYYY)</label>
+            <input type="text" id="r-asofdate" value="30092026" class="w-full px-3 py-2 border rounded-lg text-sm font-semibold text-blue-600 outline-none">
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-4">
+          <button onclick="previewReport()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold px-4 py-2 rounded-lg text-sm transition flex items-center space-x-2">
+            <i class="fa-solid fa-eye"></i><span>Refresh Preview</span>
+          </button>
+          <button onclick="downloadReportFile()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg text-sm shadow transition flex items-center space-x-2">
+            <i class="fa-solid fa-download"></i><span>Download .TXT File</span>
+          </button>
+        </div>
+
+        <div class="bg-slate-900 text-green-400 p-4 rounded-xl font-mono text-xs overflow-x-auto h-96 border border-slate-800">
+          <pre id="report-preview-box" style="white-space: pre-wrap; word-break: break-all;">Loading preview from Firebase...</pre>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ==========================================
+    // FIREBASE CONFIGURATION (FASRCMO CIC REPORT)
+    // ==========================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyA3dfJd0zcNarpSSik8ZnaNRYBMTBBf_Bo",
+      authDomain: "fasrcmo-cic-report.firebaseapp.com",
+      databaseURL: "https://fasrcmo-cic-report-default-rtdb.firebaseio.com",
+      projectId: "fasrcmo-cic-report",
+      storageBucket: "fasrcmo-cic-report.firebasestorage.app",
+      messagingSenderId: "581267722260",
+      appId: "1:581267722260:web:7b779ac96002554aba9701",
+      measurementId: "G-MF68D3HQTM"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const rdb = firebase.database();
+
+    // Local DB Cache structure
+    let db = {
+      products: [],
+      idLines: [],
+      ciLines: []
+    };
+
+    // Default Demo Data kung wala pay sulod ang Firebase
+    const defaultData = {
+      products: [
+        { id: "P1", name: "Agricultural Loan" },
+        { id: "P2", name: "Provident Loan" }
+      ],
+      idLines: [
+        `ID|CO018670|22038|30092026|22038000001|13|DARLYN|ABARRE|LLANDINO||||F|08011987||PH|PH||2|||||||||||||MI| San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI| San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|705051946|||||||||||||||||||||||3|09262484148||||||||||||||||||||||||||||||||||||||||||||`,
+        `ID|CO018670|22038|30092026|22038000004|10|CRISOGONO|ABAWAN|T.||||M|22111961||PH|PH||1|||||||||||||MI|2 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
+        `ID|CO018670|22038|30092026|22038000011|10|RANDY|ABELLAR|GRINGIN||||M|06041984|PROSPERIDAD, ADS|PH|PH||2|||||||DIONICA FLORES GRINGIN||RODOLFO|ABELLAR|BACLAAN|SR.|MI|P-2 Lucena PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|414438851000|||||||||||||||||||||||3|09488531483||||||||||||||||||||||||||||||||||||||||||||`
+      ],
+      ciLines: [
+        `CI|CO018670|22038|30092026|22038000001|B|22038-42-00675-1|21|AC||PHP|PHP|17082023||29042025|||||60000|1|NA||I||3000||0|||1|60000|1|60000|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
+        `CI|CO018670|22038|30092026|22038000004|B|22038-44-00321-8|10|AC||PHP|PHP|31012022||01072025|||||135000|1|NA||I||3214||0|||1||1|1|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
+        `CI|CO018670|22038|30092026|22038000011|B|22038-43-00658-3|10|AC||PHP|PHP|11072026||11012027|||||180000|1|NA||I||30000||0|||1|180000|0|0|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`
+      ]
+    };
+
+    function initFirebaseSync() {
+      const syncStatus = document.getElementById('sync-status');
+      
+      rdb.ref('cic_system').on('value', (snapshot) => {
+        const cloudData = snapshot.val();
+        if (cloudData) {
+          db.products = cloudData.products || [];
+          db.idLines = cloudData.idLines || [];
+          db.ciLines = cloudData.ciLines || [];
+        } else {
+          // Kung empty pa ang database, i-initialize gamit ang default data
+          rdb.ref('cic_system').set(defaultData);
+          db = defaultData;
+        }
+
+        // Refresh UI
+        renderDashboard();
+        renderProducts();
+        renderMembers();
+        renderLoans();
+        populateSelects();
+        setDefaultSubjectId();
+        setDefaultAccountNo();
+        previewReport();
+
+        syncStatus.innerHTML = `<i class="fa-solid fa-cloud-check text-emerald-400 me-1"></i><span class="text-emerald-300">Synced to Cloud</span>`;
+      }, (error) => {
+        console.error("Firebase sync error:", error);
+        syncStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-400 me-1"></i><span class="text-red-300">Sync Error</span>`;
+      });
+    }
+
+    function saveToCloud() {
+      rdb.ref('cic_system').set(db).catch((error) => {
+        alert("Error saving to Firebase: " + error.message);
+      });
+    }
+
+    function init() {
+      initFirebaseSync();
+    }
+
+    function switchTab(t) {
+      ['dashboard', 'products', 'members', 'loans', 'reports'].forEach(tab => {
+        document.getElementById(`tab-${tab}`).classList.add('hidden');
+        document.getElementById(`tab-btn-${tab}`).classList.remove('tab-active');
+        document.getElementById(`tab-btn-${tab}`).classList.add('text-slate-500');
+      });
+      document.getElementById(`tab-${t}`).classList.remove('hidden');
+      document.getElementById(`tab-btn-${t}`).classList.add('tab-active');
+      document.getElementById(`tab-btn-${t}`).classList.remove('text-slate-500');
+    }
+
+    function renderDashboard() {
+      let installmentCount = 0;
+      let nonInstallmentCount = 0;
+
+      db.ciLines.forEach(line => {
+        const parts = line.split('|');
+        const freq = parts[22] || '';
+        const term = parseInt(parts[19] || '1');
+        
+        if (freq === 'I' || (term === 1 && freq !== 'M' && freq !== 'Q' && freq !== 'W' && freq !== 'S' && freq !== 'A')) {
+          nonInstallmentCount++;
+        } else {
+          installmentCount++;
+        }
+      });
+
+      document.getElementById('stat-members').innerText = db.idLines.length;
+      document.getElementById('stat-installment').innerText = installmentCount;
+      document.getElementById('stat-noninstallment').innerText = nonInstallmentCount;
+      document.getElementById('stat-loans').innerText = db.ciLines.length;
+    }
+
+    function setDefaultSubjectId() {
+      const branch = document.getElementById('r-branch').value;
+      const nextSeq = String(db.idLines.length + 1).padStart(5, '0');
+      document.getElementById('b-subjectid').value = `${branch}${nextSeq}`;
+    }
+
+    function setDefaultAccountNo() {
+      const branch = document.getElementById('r-branch').value;
+      const nextAccSeq = String(db.ciLines.length + 1).padStart(5, '0');
+      document.getElementById('loan-accno').value = `${branch}-42-${nextAccSeq}-1`;
+    }
+
+    // --- LOAN PRODUCTS FUNCTIONS ---
+    function saveLoanProduct(event) {
+      event.preventDefault();
+      const editIndex = parseInt(document.getElementById('p-edit-index').value);
+      const name = document.getElementById('p-name').value;
+
+      if (editIndex === -1) {
+        const newId = `P${db.products.length + 1}`;
+        db.products.push({ id: newId, name });
+        alert('Na-add na ang bag-ong Loan Program!');
+      } else {
+        db.products[editIndex].name = name;
+        alert('Na-update na ang Loan Program!');
+        resetProductForm();
+      }
+
+      saveToCloud();
+    }
+
+    function renderProducts() {
+      const tbody = document.getElementById('product-table-body');
+      tbody.innerHTML = '';
+      db.products.forEach((p, idx) => {
+        tbody.innerHTML += `<tr>
+          <td class="py-3 px-3 font-semibold text-blue-600">${p.id}</td>
+          <td class="py-3 px-3 font-semibold">${p.name}</td>
+          <td class="py-3 px-3 text-right space-x-2">
+            <button onclick="editProduct(${idx})" class="text-blue-600 hover:text-blue-800" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+            <button onclick="deleteProduct(${idx})" class="text-red-600 hover:text-red-800" title="Delete"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>`;
+      });
+    }
+
+    function editProduct(idx) {
+      const p = db.products[idx];
+      document.getElementById('p-edit-index').value = idx;
+      document.getElementById('p-name').value = p.name;
+      document.getElementById('product-form-title').innerHTML = `<i class="fa-solid fa-pen-to-square text-blue-600 me-2"></i>Edit Loan Program`;
+      document.getElementById('product-submit-btn').innerText = "Update Loan Program";
+      document.getElementById('product-cancel-btn').classList.remove('hidden');
+    }
+
+    function resetProductForm() {
+      document.getElementById('productForm').reset();
+      document.getElementById('p-edit-index').value = -1;
+      document.getElementById('product-form-title').innerHTML = `<i class="fa-solid fa-circle-plus text-blue-600 me-2"></i>Add Loan Program`;
+      document.getElementById('product-submit-btn').innerText = "Save Loan Program";
+      document.getElementById('product-cancel-btn').classList.add('hidden');
+    }
+
+    function deleteProduct(idx) {
+      if (confirm('Sigurado ka ba nga tanggalon kini nga Loan Program?')) {
+        db.products.splice(idx, 1);
+        saveToCloud();
+      }
+    }
+
+    // --- BORROWERS / MEMBERS FUNCTIONS ---
+    function saveBorrower(event) {
+      event.preventDefault();
+      const editIndex = parseInt(document.getElementById('b-edit-index').value);
+      const subjectId = document.getElementById('b-subjectid').value;
+      const fname = document.getElementById('b-fname').value.toUpperCase();
+      const mname = document.getElementById('b-mname').value.toUpperCase();
+      const lname = document.getElementById('b-lname').value.toUpperCase();
+      const gender = document.getElementById('b-gender').value;
+      const bdate = document.getElementById('b-bdate').value;
+      const contact = document.getElementById('b-contact').value;
+      const address = document.getElementById('b-address').value.toUpperCase();
+
+      const provider = document.getElementById('r-provider').value;
+      const branch = document.getElementById('r-branch').value;
+      const asOfDate = document.getElementById('r-asofdate').value;
+      
+      const idType = mname ? "13" : "10";
+      let idLine = `ID|${provider}|${branch}|${asOfDate}|${subjectId}|${idType}|${fname}|${lname}|${mname}|||${gender}|${bdate}||PH|PH||1|||||||||||||MI| ${address} PH 8500||||||||||AI| ${address} PH 8500|||||||||||||||||||||||||||3|${contact}||||||||||||||||||||||||||||||||||||||||||||`;
+
+      if (editIndex === -1) {
+        db.idLines.push(idLine);
+        alert(`Malampusong na-register ang borrower! Subject ID: ${subjectId}`);
+      } else {
+        db.idLines[editIndex] = idLine;
+        alert(`Malampusong na-update ang borrower!`);
+        resetBorrowerForm();
+      }
+
+      saveToCloud();
+      document.getElementById('borrowerForm').reset();
+      setDefaultSubjectId();
+    }
+
+    function renderMembers() {
+      const tbody = document.getElementById('member-table-body');
+      tbody.innerHTML = '';
+      document.getElementById('member-count-badge').innerText = db.idLines.length;
+      db.idLines.forEach((line, idx) => {
+        const parts = line.split('|');
+        const memberId = parts[4] || 'N/A';
+        const fname = parts[6] || '';
+        const lname = parts[8] || '';
+        tbody.innerHTML += `<tr>
+          <td class="py-3 px-3 font-semibold text-blue-600">${memberId}</td>
+          <td class="py-3 px-3 font-sans font-medium text-slate-700">${fname} ${lname}</td>
+          <td class="py-3 px-3 text-slate-500 truncate max-w-xs" title="${line}">${line}</td>
+          <td class="py-3 px-3 text-right space-x-2">
+            <button onclick="editBorrower(${idx})" class="text-blue-600 hover:text-blue-800" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+            <button onclick="deleteBorrower(${idx})" class="text-red-600 hover:text-red-800" title="Delete"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>`;
+      });
+    }
+
+    function editBorrower(idx) {
+      const line = db.idLines[idx];
+      const parts = line.split('|');
+      document.getElementById('b-edit-index').value = idx;
+      document.getElementById('b-subjectid').value = parts[4] || '';
+      document.getElementById('b-fname').value = parts[6] || '';
+      document.getElementById('b-lname').value = parts[8] || '';
+      document.getElementById('b-mname').value = parts[9] || '';
+      document.getElementById('b-gender').value = parts[12] || 'M';
+      document.getElementById('b-bdate').value = parts[13] || '';
+      document.getElementById('b-contact').value = parts[56] || '';
+      
+      document.getElementById('borrower-form-title').innerHTML = `<i class="fa-solid fa-pen-to-square text-blue-600 me-2"></i>Edit Borrower ID`;
+      document.getElementById('borrower-submit-btn').innerText = "Update Borrower ID";
+      document.getElementById('borrower-cancel-btn').classList.remove('hidden');
+    }
+
+    function resetBorrowerForm() {
+      document.getElementById('borrowerForm').reset();
+      document.getElementById('b-edit-index').value = -1;
+      document.getElementById('borrower-form-title').innerHTML = `<i class="fa-solid fa-user-plus text-blue-600 me-2"></i>Register Borrower (CIC)`;
+      document.getElementById('borrower-submit-btn').innerText = "Save Borrower ID";
+      document.getElementById('borrower-cancel-btn').classList.add('hidden');
+      setDefaultSubjectId();
+    }
+
+    function deleteBorrower(idx) {
+      if (confirm('Sigurado ka ba nga tanggalon kini nga Borrower record?')) {
+        db.idLines.splice(idx, 1);
+        saveToCloud();
+        setDefaultSubjectId();
+      }
+    }
+
+    // --- LOAN APPLICATION & PAYMENTS ---
+    function populateSelects() {
+      const bSelect = document.getElementById('loan-borrower');
+      bSelect.innerHTML = '';
+      db.idLines.forEach(line => {
+        const parts = line.split('|');
+        const subjectId = parts[4];
+        const name = `${parts[6]} ${parts[8]}`;
+        bSelect.innerHTML += `<option value="${subjectId}">${subjectId} - ${name}</option>`;
+      });
+
+      const pSelect = document.getElementById('loan-program');
+      pSelect.innerHTML = '';
+      db.products.forEach(p => {
+        pSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+      });
+
+      const paySelect = document.getElementById('pay-account');
+      paySelect.innerHTML = '';
+      db.ciLines.forEach(line => {
+        const parts = line.split('|');
+        paySelect.innerHTML += `<option value="${parts[6]}">Acct: ${parts[6]} (Member: ${parts[4]})</option>`;
+      });
+    }
+
+    function applyLoan(event) {
+      event.preventDefault();
+      const accountNo = document.getElementById('loan-accno').value;
+      const borrowerId = document.getElementById('loan-borrower').value;
+      const amount = parseFloat(document.getElementById('loan-amount').value);
+      const term = parseInt(document.getElementById('loan-term').value);
+      const interest = parseFloat(document.getElementById('loan-interest').value);
+      const penalty = parseFloat(document.getElementById('loan-penalty').value);
+      const monthlyPayment = parseFloat(document.getElementById('loan-monthly').value);
+      const remainingBalance = parseFloat(document.getElementById('loan-balance').value);
+      const freq = document.getElementById('loan-freq').value;
+
+      const provider = document.getElementById('r-provider').value;
+      const branch = document.getElementById('r-branch').value;
+      const asOfDate = document.getElementById('r-asofdate').value;
+
+      const installmentIndicator = freq === 'I' ? 'I' : 'M';
+
+      let ciLine = `CI|${provider}|${branch}|${asOfDate}|${borrowerId}|B|${accountNo}|21|AC||PHP|PHP|01012026||30092028|||||${amount}|${term}|NA||${installmentIndicator}||${monthlyPayment}||0|||1|${amount}|1|${remainingBalance}|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`;
+
+      db.ciLines.push(ciLine);
+      saveToCloud();
+      document.getElementById('loanAppForm').reset();
+      setDefaultAccountNo();
+      alert(`Malampusong na-aprubahan ang pautang! Account No: ${accountNo} (Balance: ₱${remainingBalance})`);
+    }
+
+    function recordPayment(event) {
+      event.preventDefault();
+      const accountNo = document.getElementById('pay-account').value;
+      const payAmount = parseFloat(document.getElementById('pay-amount').value);
+      const date = document.getElementById('pay-date').value;
+
+      let found = false;
+      for (let i = 0; i < db.ciLines.length; i++) {
+        let parts = db.ciLines[i].split('|');
+        if (parts[6] === accountNo) {
+          let currentBalance = parseFloat(parts[33]) || 0;
+          let newBalance = Math.max(0, currentBalance - payAmount);
+          parts[33] = newBalance.toFixed(2);
+          db.ciLines[i] = parts.join('|');
+          found = true;
+          break;
+        }
+      }
+
+      if (found) {
+        document.getElementById('payment-feedback').innerText = `Nasave ang bayad nga ₱${payAmount.toFixed(2)} ug awtomatikong nabawasan ang Remaining Balance.`;
+        document.getElementById('paymentForm').reset();
+        saveToCloud();
+        alert(`Malampusong na-rekord ang payment nga PHP ${payAmount.toFixed(2)}! Awtomatikong na-update ang Remaining Balance sa account ${accountNo}.`);
+      } else {
+        alert('Wala makit-an ang maong Credit Account.');
+      }
+    }
+
+    function renderLoans() {
+      const tbody = document.getElementById('loan-table-body');
+      tbody.innerHTML = '';
+      document.getElementById('loan-count-badge').innerText = db.ciLines.length;
+      db.ciLines.forEach((line, idx) => {
+        const parts = line.split('|');
+        const memberId = parts[4] || 'N/A';
+        const loanId = parts[6] || 'N/A';
+        const balance = parts[33] || '0.00';
+        const freq = parts[22] || 'I';
+        let typeBadge = freq === 'I' ? '<span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-[10px] font-bold">Non-Installment</span>' : '<span class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-[10px] font-bold">Installment</span>';
+        
+        tbody.innerHTML += `<tr>
+          <td class="py-3 px-3 font-semibold text-emerald-600">${loanId} <br><span class="text-[10px] text-slate-500 font-normal">Bal: ₱${balance}</span></td>
+          <td class="py-3 px-3 font-semibold">${memberId}</td>
+          <td class="py-3 px-3">${typeBadge}</td>
+          <td class="py-3 px-3 text-slate-500 truncate max-w-xs" title="${line}">${line}</td>
+          <td class="py-3 px-3 text-right">
+            <button onclick="deleteLoan(${idx})" class="text-red-600 hover:text-red-800" title="Delete"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>`;
+      });
+      populateSelects();
+    }
+
+    function deleteLoan(idx) {
+      if (confirm('Sigurado ka ba nga tanggalon kini nga Loan/Credit Account?')) {
+        db.ciLines.splice(idx, 1);
+        saveToCloud();
+      }
+    }
+
+    // EXACT CIC CSDF REPORT BUILDER
+    function buildPipeReport() {
+      const provider = document.getElementById('r-provider').value;
+      const branch = document.getElementById('r-branch').value;
+      const asOfDate = document.getElementById('r-asofdate').value;
+      const totalRecs = db.idLines.length + db.ciLines.length;
+
+      let lines = [];
+      lines.push(`HD|${provider}|${asOfDate}|1.0|0|`);
+      
+      db.idLines.forEach(line => { lines.push(line); });
+      db.ciLines.forEach(line => { lines.push(line); });
+
+      lines.push(`FT|${provider}|${asOfDate}|${totalRecs}`);
+      return lines.join("\n");
+    }
+
+    function previewReport() {
+      document.getElementById('report-preview-box').innerText = buildPipeReport();
+    }
+
+    function downloadReportFile() {
+      const content = buildPipeReport();
+      const filename = `${document.getElementById('r-provider').value}_CSDF_${document.getElementById('r-asofdate').value}.txt`;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8'>>(0) });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    init();
+  </script>
+</body>
+</html>
