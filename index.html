@@ -126,7 +126,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="space-y-6 lg:col-span-1">
           
-          <!-- BULK PASTE BOX FOR MULTIPLE ID & CI LINES -->
+          <!-- BULK PASTE BOX -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
             <h2 class="text-md font-bold text-slate-800 mb-2"><i class="fa-solid fa-file-import text-blue-600 me-2"></i>Bulk Import ID & CI Lines</h2>
             <p class="text-xs text-slate-500 mb-2">I-paste dinhi ang imong daghang ID lines o Credit Account (CI) lines ug i-klik ang Import button.</p>
@@ -358,7 +358,7 @@
                 <i class="fa-solid fa-download"></i><span>Download .TXT File</span>
               </button>
             </div>
-            <!-- BAG-ONG BUTTON PARA SA PAG-SAVE SA MONTHLY REPORT RECORD -->
+            <!-- BUTTON PARA SA PAG-SAVE SA MONTHLY REPORT RECORD -->
             <button onclick="saveMonthlyReportRecord()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2 rounded-lg text-sm shadow transition flex items-center space-x-2">
               <i class="fa-solid fa-floppy-disk"></i><span>Save Monthly Report Record</span>
             </button>
@@ -369,7 +369,7 @@
           </div>
         </div>
 
-        <!-- MGA RECORD SA NANGAGING MONTHLY GENERATION -->
+        <!-- TABLE PARA SA MGA NANGAGING MONTHLY GENERATION RECORDS -->
         <div class="border-t pt-6">
           <h3 class="text-md font-bold text-slate-800 mb-3 flex items-center justify-between">
             <span><i class="fa-solid fa-clock-rotate-left text-blue-600 me-2"></i> Monthly Report Generation History & Records</span>
@@ -417,7 +417,7 @@
       products: [],
       idLines: [],
       ciLines: [],
-      reportHistory: [] // Gitipigan usab sa cloud ang history
+      reportHistory: []
     };
 
     const defaultData = {
@@ -913,7 +913,7 @@
       document.body.removeChild(a);
     }
 
-    // --- MGA FUNCTION PARA SA PAG-SAVE UG PAG-DISPLAY SA MONTHLY REPORT RECORD ---
+    // --- FUNCTION PARA SA PAG-SAVE UG PAG-DISPLAY SA MONTHLY REPORT RECORD ---
     function saveMonthlyReportRecord() {
       const asOfDate = document.getElementById('r-asofdate').value.trim();
       let installmentCount = 0;
@@ -949,7 +949,7 @@
         db.reportHistory = [];
       }
 
-      db.reportHistory.unshift(newRecord); // Ibutang sa kinatas-an
+      db.reportHistory.unshift(newRecord);
       saveToCloud();
       renderReportHistory();
       alert("Malampusong na-save ang Monthly Report Record!");
