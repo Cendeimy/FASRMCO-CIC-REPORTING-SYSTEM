@@ -8,7 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Firebase SDKs (Compat Version para sa sayon nga Single-File setup) -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <style>
@@ -86,7 +86,7 @@
       
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <h3 class="text-md font-bold text-slate-800 mb-2"><i class="fa-solid fa-circle-info text-blue-600 me-2"></i>Cloud Firebase Connected</h3>
-        <p class="text-sm text-slate-600">This dashboard summarizes your live cloud database records. Any entries made on other devices connected to this Firebase project will automatically sync here in real-time.</p>
+        <p class="text-sm text-slate-600">This dashboard summarizes your live cloud database records.</p>
       </div>
     </section>
 
@@ -202,9 +202,7 @@
     <!-- 4. LOANS & PAYMENTS TAB -->
     <section id="tab-loans" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Left column: Borrow Loan / Apply Loan & Payments -->
         <div class="space-y-6 lg:col-span-1">
-          <!-- Borrow Loan Form -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
             <h2 class="text-lg font-bold text-slate-800 mb-3" id="loan-form-title"><i class="fa-solid fa-hand-holding-dollar text-blue-600 me-2"></i>Borrower Loan Application</h2>
             <form id="loanAppForm" onsubmit="applyLoan(event)" class="space-y-3 text-sm">
@@ -215,18 +213,12 @@
               </div>
               <div>
                 <label class="block font-semibold text-slate-600 mb-1">Select Borrower</label>
-                <select id="loan-borrower" required class="w-full px-3 py-2 border rounded-lg outline-none text-xs font-mono">
-                  <!-- Dynamically populated -->
-                </select>
+                <select id="loan-borrower" required class="w-full px-3 py-2 border rounded-lg outline-none text-xs font-mono"></select>
               </div>
               <div>
                 <label class="block font-semibold text-slate-600 mb-1">Select Loan Program</label>
-                <select id="loan-program" required class="w-full px-3 py-2 border rounded-lg outline-none text-xs">
-                  <!-- Dynamically populated -->
-                </select>
+                <select id="loan-program" required class="w-full px-3 py-2 border rounded-lg outline-none text-xs"></select>
               </div>
-
-              <!-- Manual Interest & Penalty Input Fields -->
               <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-lg border">
                 <div>
                   <label class="block font-semibold text-slate-600 mb-1 text-xs">Interest Rate (%)</label>
@@ -237,7 +229,6 @@
                   <input type="number" step="0.1" id="loan-penalty" placeholder="2.0" class="w-full px-2 py-1.5 border rounded bg-white text-xs font-bold text-amber-600 outline-none">
                 </div>
               </div>
-
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block font-semibold text-slate-600 mb-1">Loan Amount</label>
@@ -248,8 +239,6 @@
                   <input type="number" id="loan-term" required placeholder="12" class="w-full px-3 py-2 border rounded-lg outline-none text-sm">
                 </div>
               </div>
-
-              <!-- Disbursement Date & Maturity Date Fields -->
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block font-semibold text-slate-600 mb-1 text-xs">Disbursement Date</label>
@@ -260,7 +249,6 @@
                   <input type="text" id="loan-matdate" required placeholder="29042025" class="w-full px-2 py-1.5 border rounded text-xs font-mono outline-none">
                 </div>
               </div>
-
               <div>
                 <label class="block font-semibold text-slate-600 mb-1">Monthly Payment Amount</label>
                 <input type="number" step="0.01" id="loan-monthly" required placeholder="4500.00" class="w-full px-3 py-2 border rounded-lg outline-none text-sm text-blue-600 font-semibold">
@@ -285,15 +273,12 @@
             </form>
           </div>
 
-          <!-- Record Payment Form -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
             <h2 class="text-lg font-bold text-slate-800 mb-3"><i class="fa-solid fa-money-bill-wave text-emerald-600 me-2"></i>Record Payment</h2>
             <form id="paymentForm" onsubmit="recordPayment(event)" class="space-y-3 text-sm">
               <div>
                 <label class="block font-semibold text-slate-600 mb-1">Select Credit Account (CI)</label>
-                <select id="pay-account" required class="w-full px-3 py-2 border rounded-lg font-mono text-xs outline-none">
-                  <!-- Dynamically populated -->
-                </select>
+                <select id="pay-account" required class="w-full px-3 py-2 border rounded-lg font-mono text-xs outline-none"></select>
               </div>
               <div>
                 <label class="block font-semibold text-slate-600 mb-1">Payment Amount (PHP)</label>
@@ -309,7 +294,6 @@
           </div>
         </div>
 
-        <!-- Right column: Loaded Credit Accounts (CIs) -->
         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
           <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center justify-between">
             <span><i class="fa-solid fa-hand-holding-dollar text-emerald-600 me-2"></i> Loaded Credit Account (CI) Records</span>
@@ -374,9 +358,6 @@
   </main>
 
   <script>
-    // ==========================================
-    // FIREBASE CONFIGURATION (FASRCMO CIC REPORT)
-    // ==========================================
     const firebaseConfig = {
       apiKey: "AIzaSyA3dfJd0zcNarpSSik8ZnaNRYBMTBBf_Bo",
       authDomain: "fasrcmo-cic-report.firebaseapp.com",
@@ -388,18 +369,15 @@
       measurementId: "G-MF68D3HQTM"
     };
 
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const rdb = firebase.database();
 
-    // Local DB Cache structure
     let db = {
       products: [],
       idLines: [],
       ciLines: []
     };
 
-    // Default Demo Data kung wala pay sulod ang Firebase
     const defaultData = {
       products: [
         { id: "P1", name: "Agricultural Loan" },
@@ -419,7 +397,6 @@
 
     function initFirebaseSync() {
       const syncStatus = document.getElementById('sync-status');
-      
       rdb.ref('cic_system').on('value', (snapshot) => {
         const cloudData = snapshot.val();
         if (cloudData) {
@@ -430,7 +407,6 @@
           rdb.ref('cic_system').set(defaultData);
           db = defaultData;
         }
-
         renderDashboard();
         renderProducts();
         renderMembers();
@@ -439,7 +415,6 @@
         setDefaultSubjectId();
         setDefaultAccountNo();
         previewReport();
-
         syncStatus.innerHTML = `<i class="fa-solid fa-cloud-check text-emerald-400 me-1"></i><span class="text-emerald-300">Synced to Cloud</span>`;
       }, (error) => {
         console.error("Firebase sync error:", error);
@@ -471,19 +446,16 @@
     function renderDashboard() {
       let installmentCount = 0;
       let nonInstallmentCount = 0;
-
       db.ciLines.forEach(line => {
         const parts = line.split('|');
         const freq = parts[22] || '';
         const term = parseInt(parts[19] || '1');
-        
         if (freq === 'I' || (term === 1 && freq !== 'M' && freq !== 'Q' && freq !== 'W' && freq !== 'S' && freq !== 'A')) {
           nonInstallmentCount++;
         } else {
           installmentCount++;
         }
       });
-
       document.getElementById('stat-members').innerText = db.idLines.length;
       document.getElementById('stat-installment').innerText = installmentCount;
       document.getElementById('stat-noninstallment').innerText = nonInstallmentCount;
@@ -502,12 +474,10 @@
       document.getElementById('loan-accno').value = `${branch}-42-${nextAccSeq}-1`;
     }
 
-    // --- LOAN PRODUCTS FUNCTIONS ---
     function saveLoanProduct(event) {
       event.preventDefault();
       const editIndex = parseInt(document.getElementById('p-edit-index').value);
       const name = document.getElementById('p-name').value;
-
       if (editIndex === -1) {
         const newId = `P${db.products.length + 1}`;
         db.products.push({ id: newId, name });
@@ -517,7 +487,6 @@
         alert('Na-update na ang Loan Program!');
         resetProductForm();
       }
-
       saveToCloud();
     }
 
@@ -560,7 +529,6 @@
       }
     }
 
-    // --- BORROWERS / MEMBERS FUNCTIONS (WITH DUPLICATE CHECKING) ---
     function saveBorrower(event) {
       event.preventDefault();
       const editIndex = parseInt(document.getElementById('b-edit-index').value);
@@ -573,7 +541,6 @@
       const contact = document.getElementById('b-contact').value.trim();
       const address = document.getElementById('b-address').value.toUpperCase().trim();
 
-      // DUPLICATE CHECKING (Kung bag-ong rehistro pa lang)
       if (editIndex === -1) {
         for (let i = 0; i < db.idLines.length; i++) {
           const parts = db.idLines[i].split('|');
@@ -581,14 +548,12 @@
           const existingFname = parts[6];
           const existingLname = parts[8];
           const existingMname = parts[9] || '';
-
           if (existingId === subjectId) {
-            alert(`Hulata! Ang Subject ID nga "${subjectId}" anaa na sa sistema. Dili pwede mag-double.`);
+            alert(`Hulata! Ang Subject ID nga "${subjectId}" anaa na sa sistema.`);
             return;
           }
-
           if (existingFname === fname && existingLname === lname && existingMname === mname) {
-            alert(`Hulata! Ang pangalan nga "${fname} ${mname} ${lname}" narehistro na daan sa sistema.`);
+            alert(`Hulata! Ang pangalan nga "${fname} ${mname} ${lname}" narehistro na daan.`);
             return;
           }
         }
@@ -597,7 +562,6 @@
       const provider = document.getElementById('r-provider').value;
       const branch = document.getElementById('r-branch').value;
       const asOfDate = document.getElementById('r-asofdate').value;
-      
       const idType = mname ? "13" : "10";
       let idLine = `ID|${provider}|${branch}|${asOfDate}|${subjectId}|${idType}|${fname}|${lname}|${mname}|||${gender}|${bdate}||PH|PH||1|||||||||||||MI| ${address} PH 8500||||||||||AI| ${address} PH 8500|||||||||||||||||||||||||||3|${contact}||||||||||||||||||||||||||||||||||||||||||||`;
 
@@ -609,7 +573,6 @@
         alert(`Malampusong na-update ang borrower!`);
         resetBorrowerForm();
       }
-
       saveToCloud();
       document.getElementById('borrowerForm').reset();
       setDefaultSubjectId();
@@ -647,7 +610,6 @@
       document.getElementById('b-gender').value = parts[12] || 'M';
       document.getElementById('b-bdate').value = parts[13] || '';
       document.getElementById('b-contact').value = parts[56] || '';
-      
       document.getElementById('borrower-form-title').innerHTML = `<i class="fa-solid fa-pen-to-square text-blue-600 me-2"></i>Edit Borrower ID`;
       document.getElementById('borrower-submit-btn').innerText = "Update Borrower ID";
       document.getElementById('borrower-cancel-btn').classList.remove('hidden');
@@ -670,7 +632,6 @@
       }
     }
 
-    // --- LOAN APPLICATION & PAYMENTS ---
     function populateSelects() {
       const bSelect = document.getElementById('loan-borrower');
       bSelect.innerHTML = '';
@@ -711,7 +672,6 @@
       const provider = document.getElementById('r-provider').value;
       const branch = document.getElementById('r-branch').value;
       const asOfDate = document.getElementById('r-asofdate').value;
-
       const installmentIndicator = freq === 'I' ? 'I' : 'M';
 
       let ciLine = `CI|${provider}|${branch}|${asOfDate}|${borrowerId}|B|${accountNo}|21|AC||PHP|PHP|${disbDate}||${matDate}|||||${amount}|${term}|NA||${installmentIndicator}||${monthlyPayment}||0|||1|${amount}|1|${remainingBalance}|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`;
@@ -724,7 +684,6 @@
         alert(`Malampusong na-update ang Credit Account ${accountNo}!`);
         resetLoanForm();
       }
-
       saveToCloud();
       document.getElementById('loanAppForm').reset();
       setDefaultAccountNo();
@@ -733,7 +692,6 @@
     function editLoan(idx) {
       const line = db.ciLines[idx];
       const parts = line.split('|');
-      
       document.getElementById('loan-edit-index').value = idx;
       document.getElementById('loan-accno').value = parts[6] || '';
       document.getElementById('loan-borrower').value = parts[4] || '';
@@ -781,7 +739,7 @@
         document.getElementById('payment-feedback').innerText = `Nasave ang bayad nga ₱${payAmount.toFixed(2)} ug awtomatikong nabawasan ang Remaining Balance.`;
         document.getElementById('paymentForm').reset();
         saveToCloud();
-        alert(`Malampusong na-rekord ang payment nga PHP ${payAmount.toFixed(2)}! Awtomatikong na-update ang Remaining Balance sa account ${accountNo}.`);
+        alert(`Malampusong na-rekord ang payment nga PHP ${payAmount.toFixed(2)}!`);
       } else {
         alert('Wala makit-an ang maong Credit Account.');
       }
@@ -820,7 +778,6 @@
       }
     }
 
-    // EXACT CIC CSDF REPORT BUILDER (Dinamikong i-sync ang As-Of Date sa ID ug CI lines)
     function buildPipeReport() {
       const provider = document.getElementById('r-provider').value;
       const branch = document.getElementById('r-branch').value;
@@ -830,17 +787,15 @@
       let lines = [];
       lines.push(`HD|${provider}|${asOfDate}|1.0|0|`);
       
-      // I-update ang petsa sa ID lines subay sa report As-Of Date
       db.idLines.forEach(line => { 
         let parts = line.split('|');
-        parts[3] = asOfDate; // Sync reporting date
+        parts[3] = asOfDate;
         lines.push(parts.join('|')); 
       });
 
-      // I-update ang petsa sa CI lines subay sa report As-Of Date
       db.ciLines.forEach(line => { 
         let parts = line.split('|');
-        parts[3] = asOfDate; // Sync reporting date
+        parts[3] = asOfDate;
         lines.push(parts.join('|')); 
       });
 
@@ -854,7 +809,13 @@
 
     function downloadReportFile() {
       const content = buildPipeReport();
-      const filename = `${document.getElementById('r-provider').value}_CSDF_${document.getElementById('r-asofdate').value}.txt`;
+      const provider = document.getElementById('r-provider').value;
+      const branch = document.getElementById('r-branch').value;
+      const asOfDate = document.getElementById('r-asofdate').value;
+      
+      // Gi-format ang filename nga naay Provider Code, Branch Code, ug As-Of Date
+      const filename = `${provider}_${branch}_CSDF_${asOfDate}.txt`;
+      
       const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
