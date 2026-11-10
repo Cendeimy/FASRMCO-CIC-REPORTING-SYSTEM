@@ -298,7 +298,7 @@
           </div>
         </div>
 
-        <!-- LIGHTWEIGHT LOANS TABLE (Gikinahanglan nga Detalye Ra) -->
+        <!-- LIGHTWEIGHT LOANS TABLE -->
         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
           <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center justify-between">
             <span><i class="fa-solid fa-hand-holding-dollar text-emerald-600 me-2"></i> Loaded Credit Account Records</span>
@@ -356,6 +356,7 @@
                 <i class="fa-solid fa-download"></i><span>Download .TXT File</span>
               </button>
             </div>
+            <!-- BUTTON PARA SA PAG-SAVE SA MONTHLY REPORT RECORD -->
             <button onclick="saveMonthlyReportRecord()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2 rounded-lg text-sm shadow transition flex items-center space-x-2">
               <i class="fa-solid fa-floppy-disk"></i><span>Save Monthly Report Record</span>
             </button>
@@ -366,6 +367,7 @@
           </div>
         </div>
 
+        <!-- TABLE PARA SA MGA NANGAGING MONTHLY GENERATION RECORDS -->
         <div class="border-t pt-6">
           <h3 class="text-md font-bold text-slate-800 mb-3 flex items-center justify-between">
             <span><i class="fa-solid fa-clock-rotate-left text-blue-600 me-2"></i> Monthly Report Generation History & Records</span>
@@ -668,7 +670,6 @@
       setDefaultSubjectId();
     }
 
-    // LIGHTWEIGHT BORROWER TABLE (CID ug Name Lang)
     function renderMembers() {
       const tbody = document.getElementById('member-table-body');
       document.getElementById('member-count-badge').innerText = db.idLines.length;
@@ -845,7 +846,6 @@
       }
     }
 
-    // LIGHTWEIGHT LOANS TABLE (CID, Name, Account No, Loan Amt, Disb/Maturity, Monthly/Balance)
     function renderLoans() {
       const tbody = document.getElementById('loan-table-body');
       document.getElementById('loan-count-badge').innerText = db.ciLines.length;
@@ -863,7 +863,6 @@
         const monthlyPay = parts[24] || '0.00';
         const balance = parts[33] || '0.00';
 
-        // Pangitaon ang pangalan sa borrower gamit ang borrowerId gikan sa idLines
         let borrowerName = "N/A";
         for (let j = 0; j < db.idLines.length; j++) {
           const bParts = db.idLines[j].split('|');
@@ -957,6 +956,7 @@
       document.body.removeChild(a);
     }
 
+    // --- FUNCTION PARA SA PAG-SAVE UG PAG-DISPLAY SA MONTHLY REPORT RECORD ---
     function saveMonthlyReportRecord() {
       const asOfDate = document.getElementById('r-asofdate').value.trim();
       let installmentCount = 0;
