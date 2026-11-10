@@ -83,11 +83,6 @@
           <div class="text-3xl font-bold text-emerald-600 mt-2" id="stat-loans">0</div>
         </div>
       </div>
-      
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <h3 class="text-md font-bold text-slate-800 mb-2"><i class="fa-solid fa-circle-info text-blue-600 me-2"></i>Cloud Firebase Connected</h3>
-        <p class="text-sm text-slate-600">This dashboard summarizes your live cloud database records.</p>
-      </div>
     </section>
 
     <!-- 2. LOAN PRODUCTS TAB -->
@@ -129,52 +124,65 @@
     <!-- 3. MEMBERS / BORROWERS TAB -->
     <section id="tab-members" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-1">
-          <h2 class="text-lg font-bold text-slate-800 mb-4" id="borrower-form-title"><i class="fa-solid fa-user-plus text-blue-600 me-2"></i>Register Borrower (CIC)</h2>
-          <form id="borrowerForm" onsubmit="saveBorrower(event)" class="space-y-3 text-sm">
-            <input type="hidden" id="b-edit-index" value="-1">
-            <div>
-              <label class="block font-semibold text-slate-600 mb-1">Subject ID (CIC Standard)</label>
-              <input type="text" id="b-subjectid" required placeholder="22038000055" class="w-full px-3 py-2 border rounded-lg font-mono outline-none">
-            </div>
-            <div>
-              <label class="block font-semibold text-slate-600 mb-1">First Name</label>
-              <input type="text" id="b-fname" required placeholder="JUAN" class="w-full px-3 py-2 border rounded-lg uppercase outline-none">
-            </div>
-            <div>
-              <label class="block font-semibold text-slate-600 mb-1">Middle Name</label>
-              <input type="text" id="b-mname" placeholder="SANTOS" class="w-full px-3 py-2 border rounded-lg uppercase outline-none">
-            </div>
-            <div>
-              <label class="block font-semibold text-slate-600 mb-1">Last Name</label>
-              <input type="text" id="b-lname" required placeholder="DELA CRUZ" class="w-full px-3 py-2 border rounded-lg uppercase outline-none">
-            </div>
-            <div class="grid grid-cols-2 gap-2">
+        <div class="space-y-6 lg:col-span-1">
+          
+          <!-- BULK PASTE BOX FOR MULTIPLE ID & CI LINES -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <h2 class="text-md font-bold text-slate-800 mb-2"><i class="fa-solid fa-file-import text-blue-600 me-2"></i>Bulk Import ID & CI Lines</h2>
+            <p class="text-xs text-slate-500 mb-2">I-paste dinhi ang imong daghang ID lines o Credit Account (CI) lines ug i-klik ang Import button.</p>
+            <textarea id="bulk-id-box" placeholder="I-paste dinhi ang daghang ID o CI lines..." class="w-full p-2 border rounded font-mono text-[10px] bg-slate-50 h-32 outline-none mb-2"></textarea>
+            <button type="button" onclick="importBulkIDs()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded text-xs shadow transition">Import Bulk ID & CI Lines</button>
+          </div>
+
+          <!-- SINGLE BORROWER FORM -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <h2 class="text-lg font-bold text-slate-800 mb-4" id="borrower-form-title"><i class="fa-solid fa-user-plus text-blue-600 me-2"></i>Register Borrower (CIC)</h2>
+            <form id="borrowerForm" onsubmit="saveBorrower(event)" class="space-y-3 text-sm">
+              <input type="hidden" id="b-edit-index" value="-1">
               <div>
-                <label class="block font-semibold text-slate-600 mb-1">Gender</label>
-                <select id="b-gender" class="w-full px-3 py-2 border rounded-lg outline-none">
-                  <option value="M">Male</option>
-                  <option value="F">Female</option>
-                </select>
+                <label class="block font-semibold text-slate-600 mb-1">Subject ID (CIC Standard)</label>
+                <input type="text" id="b-subjectid" required placeholder="22038000055" class="w-full px-3 py-2 border rounded-lg font-mono outline-none">
               </div>
               <div>
-                <label class="block font-semibold text-slate-600 mb-1">Birthdate (DDMMYYYY)</label>
-                <input type="text" id="b-bdate" required placeholder="15081985" class="w-full px-3 py-2 border rounded-lg outline-none">
+                <label class="block font-semibold text-slate-600 mb-1">First Name</label>
+                <input type="text" id="b-fname" required placeholder="JUAN" class="w-full px-3 py-2 border rounded-lg uppercase outline-none">
               </div>
-            </div>
-            <div>
-              <label class="block font-semibold text-slate-600 mb-1">Contact Number</label>
-              <input type="text" id="b-contact" placeholder="09123456789" class="w-full px-3 py-2 border rounded-lg outline-none">
-            </div>
-            <div>
-              <label class="block font-semibold text-slate-600 mb-1">Address / Purok / Barangay</label>
-              <input type="text" id="b-address" required placeholder="San Vicente PROSPERIDAD AGUSAN DEL SUR" class="w-full px-3 py-2 border rounded-lg uppercase outline-none">
-            </div>
-            <div class="flex space-x-2">
-              <button type="submit" id="borrower-submit-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg shadow transition">Save Borrower ID</button>
-              <button type="button" onclick="resetBorrowerForm()" id="borrower-cancel-btn" class="hidden bg-slate-300 hover:bg-slate-400 text-slate-700 font-semibold py-2.5 px-3 rounded-lg transition">Cancel</button>
-            </div>
-          </form>
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Middle Name</label>
+                <input type="text" id="b-mname" placeholder="SANTOS" class="w-full px-3 py-2 border rounded-lg uppercase outline-none">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Last Name</label>
+                <input type="text" id="b-lname" required placeholder="DELA CRUZ" class="w-full px-3 py-2 border rounded-lg uppercase outline-none">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-semibold text-slate-600 mb-1">Gender</label>
+                  <select id="b-gender" class="w-full px-3 py-2 border rounded-lg outline-none">
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-semibold text-slate-600 mb-1">Birthdate (DDMMYYYY)</label>
+                  <input type="text" id="b-bdate" required placeholder="15081985" class="w-full px-3 py-2 border rounded-lg outline-none">
+                </div>
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Contact Number</label>
+                <input type="text" id="b-contact" placeholder="09123456789" class="w-full px-3 py-2 border rounded-lg outline-none">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Address / Purok / Barangay</label>
+                <input type="text" id="b-address" required placeholder="San Vicente PROSPERIDAD AGUSAN DEL SUR" class="w-full px-3 py-2 border rounded-lg uppercase outline-none">
+              </div>
+              <div class="flex space-x-2">
+                <button type="submit" id="borrower-submit-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg shadow transition">Save Borrower ID</button>
+                <button type="button" onclick="resetBorrowerForm()" id="borrower-cancel-btn" class="hidden bg-slate-300 hover:bg-slate-400 text-slate-700 font-semibold py-2.5 px-3 rounded-lg transition">Cancel</button>
+              </div>
+            </form>
+          </div>
+
         </div>
 
         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
@@ -182,7 +190,7 @@
             <span><i class="fa-solid fa-users text-blue-600 me-2"></i> Registered Borrower Records (CIC Standard)</span>
             <span class="text-xs text-slate-500 font-normal">Total: <strong id="member-count-badge">0</strong></span>
           </h2>
-          <div class="overflow-x-auto max-h-[500px]">
+          <div class="overflow-x-auto max-h-[700px]">
             <table class="w-full text-left text-sm text-slate-600">
               <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-xs border-b sticky top-0">
                 <tr>
@@ -319,39 +327,72 @@
 
     <!-- 5. GENERATE REPORT TAB -->
     <section id="tab-reports" class="hidden space-y-6">
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 max-w-5xl mx-auto">
-        <h2 class="text-xl font-bold text-slate-800 mb-2 flex items-center">
-          <i class="fa-solid fa-file-export text-blue-600 me-2"></i> Monthly CIC Report Generator
-        </h2>
-        <p class="text-sm text-slate-500 mb-6">Generates exact format matching your official CIC CSDF file structure with ID and CI records from Firebase.</p>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border">
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">PROVIDER CODE</label>
-            <input type="text" id="r-provider" value="CO018670" class="w-full px-3 py-2 border rounded-lg text-sm font-semibold text-slate-700">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 max-w-5xl mx-auto space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800 mb-2 flex items-center">
+            <i class="fa-solid fa-file-export text-blue-600 me-2"></i> Monthly CIC Report Generator
+          </h2>
+          <p class="text-sm text-slate-500 mb-6">Generates exact format matching your official CIC CSDF file structure with ID and CI records from Firebase.</p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">PROVIDER CODE</label>
+              <input type="text" id="r-provider" value="CO018670" class="w-full px-3 py-2 border rounded-lg text-sm font-semibold text-slate-700">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">BRANCH CODE</label>
+              <input type="text" id="r-branch" value="22038" class="w-full px-3 py-2 border rounded-lg text-sm font-semibold text-slate-700">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">AS OF DATE (DDMMYYYY)</label>
+              <input type="text" id="r-asofdate" value="31102026" class="w-full px-3 py-2 border rounded-lg text-sm font-semibold text-blue-600 outline-none">
+            </div>
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">BRANCH CODE</label>
-            <input type="text" id="r-branch" value="22038" class="w-full px-3 py-2 border rounded-lg text-sm font-semibold text-slate-700">
+
+          <div class="flex flex-wrap gap-3 items-center justify-between mb-4">
+            <div class="flex space-x-2">
+              <button onclick="previewReport()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold px-4 py-2 rounded-lg text-sm transition flex items-center space-x-2">
+                <i class="fa-solid fa-eye"></i><span>Refresh Preview</span>
+              </button>
+              <button onclick="downloadReportFile()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg text-sm shadow transition flex items-center space-x-2">
+                <i class="fa-solid fa-download"></i><span>Download .TXT File</span>
+              </button>
+            </div>
+            <!-- BAG-ONG BUTTON PARA SA PAG-SAVE SA MONTHLY REPORT RECORD -->
+            <button onclick="saveMonthlyReportRecord()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2 rounded-lg text-sm shadow transition flex items-center space-x-2">
+              <i class="fa-solid fa-floppy-disk"></i><span>Save Monthly Report Record</span>
+            </button>
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">AS OF DATE (DDMMYYYY)</label>
-            <input type="text" id="r-asofdate" value="31102026" class="w-full px-3 py-2 border rounded-lg text-sm font-semibold text-blue-600 outline-none">
+
+          <div class="bg-slate-900 text-green-400 p-4 rounded-xl font-mono text-xs overflow-x-auto h-64 border border-slate-800">
+            <pre id="report-preview-box" style="white-space: pre-wrap; word-break: break-all;">Loading preview from Firebase...</pre>
           </div>
         </div>
 
-        <div class="flex justify-between items-center mb-4">
-          <button onclick="previewReport()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold px-4 py-2 rounded-lg text-sm transition flex items-center space-x-2">
-            <i class="fa-solid fa-eye"></i><span>Refresh Preview</span>
-          </button>
-          <button onclick="downloadReportFile()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg text-sm shadow transition flex items-center space-x-2">
-            <i class="fa-solid fa-download"></i><span>Download .TXT File</span>
-          </button>
+        <!-- MGA RECORD SA NANGAGING MONTHLY GENERATION -->
+        <div class="border-t pt-6">
+          <h3 class="text-md font-bold text-slate-800 mb-3 flex items-center justify-between">
+            <span><i class="fa-solid fa-clock-rotate-left text-blue-600 me-2"></i> Monthly Report Generation History & Records</span>
+            <span class="text-xs text-slate-500 font-normal">Total Records Saved: <strong id="history-count-badge">0</strong></span>
+          </h3>
+          <div class="overflow-x-auto max-h-80">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-xs border-b sticky top-0">
+                <tr>
+                  <th class="py-2.5 px-3">Date Generated</th>
+                  <th class="py-2.5 px-3">As Of Date</th>
+                  <th class="py-2.5 px-3 text-center">No. of Customer</th>
+                  <th class="py-2.5 px-3 text-center">Installment</th>
+                  <th class="py-2.5 px-3 text-center">Non-Installment</th>
+                  <th class="py-2.5 px-3 text-center">Total Credit Acct</th>
+                  <th class="py-2.5 px-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="report-history-table-body" class="divide-y text-xs"></tbody>
+            </table>
+          </div>
         </div>
 
-        <div class="bg-slate-900 text-green-400 p-4 rounded-xl font-mono text-xs overflow-x-auto h-96 border border-slate-800">
-          <pre id="report-preview-box" style="white-space: pre-wrap; word-break: break-all;">Loading preview from Firebase...</pre>
-        </div>
       </div>
     </section>
 
@@ -375,7 +416,8 @@
     let db = {
       products: [],
       idLines: [],
-      ciLines: []
+      ciLines: [],
+      reportHistory: [] // Gitipigan usab sa cloud ang history
     };
 
     const defaultData = {
@@ -383,16 +425,9 @@
         { id: "P1", name: "Agricultural Loan" },
         { id: "P2", name: "Provident Loan" }
       ],
-      idLines: [
-        "ID|CO018670|22038|31102026|22038000001|13|DARLYN|ABARRE|LLANDINO||||F|08011987||PH|PH||2|||||||||||||MI| San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI| San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|705051946|||||||||||||||||||||||3|09262484148||||||||||||||||||||||||||||||||||||||||||||",
-        "ID|CO018670|22038|31102026|22038000004|10|CRISOGONO|ABAWAN|T.||||M|22111961||PH|PH||1|||||||||||||MI|2 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||",
-        "ID|CO018670|22038|31102026|22038000011|10|RANDY|ABELLAR|GRINGIN||||M|06041984|PROSPERIDAD, ADS|PH|PH||2|||||||DIONICA FLORES GRINGIN||RODOLFO|ABELLAR|BACLAAN|SR.|MI|P-2 Lucena PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|414438851000|||||||||||||||||||||||3|09488531483||||||||||||||||||||||||||||||||||||||||||||"
-      ],
-      ciLines: [
-        "CI|CO018670|22038|31102026|22038000001|B|22038-42-00675-1|21|AC||PHP|PHP|17082023||29042025|||||60000|1|NA||I||3000||0|||1|60000|1|60000|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||",
-        "CI|CO018670|22038|31102026|22038000004|B|22038-44-00321-8|10|AC||PHP|PHP|31012022||01072025|||||135000|1|NA||I||3214||0|||1||1|1|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||",
-        "CI|CO018670|22038|31102026|22038000011|B|22038-43-00658-3|10|AC||PHP|PHP|11072026||11012027|||||180000|1|NA||I||30000||0|||1|180000|0|0|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
-      ]
+      idLines: [],
+      ciLines: [],
+      reportHistory: []
     };
 
     function initFirebaseSync() {
@@ -403,6 +438,7 @@
           db.products = cloudData.products || [];
           db.idLines = cloudData.idLines || [];
           db.ciLines = cloudData.ciLines || [];
+          db.reportHistory = cloudData.reportHistory || [];
         } else {
           rdb.ref('cic_system').set(defaultData);
           db = defaultData;
@@ -411,6 +447,7 @@
         renderProducts();
         renderMembers();
         renderLoans();
+        renderReportHistory();
         populateSelects();
         setDefaultSubjectId();
         setDefaultAccountNo();
@@ -474,20 +511,72 @@
       document.getElementById('loan-accno').value = `${branch}-42-${nextAccSeq}-1`;
     }
 
+    function importBulkIDs() {
+      const rawText = document.getElementById('bulk-id-box').value.trim();
+      if (!rawText) {
+        alert("Palihog i-paste ang mga ID o CI lines sa kahon sa dili pa i-klik ang import.");
+        return;
+      }
+
+      const lines = rawText.split('\n');
+      let addedIDs = 0;
+      let addedCIs = 0;
+      let duplicateCount = 0;
+
+      lines.forEach(line => {
+        const cleanLine = line.trim();
+        
+        if (cleanLine.startsWith('ID|')) {
+          const parts = cleanLine.split('|');
+          const subjectId = parts[4];
+          const exists = db.idLines.some(existing => existing.split('|')[4] === subjectId);
+          if (!exists) {
+            db.idLines.push(cleanLine);
+            addedIDs++;
+          } else {
+            duplicateCount++;
+          }
+        } 
+        else if (cleanLine.startsWith('CI|')) {
+          const parts = cleanLine.split('|');
+          const accountNo = parts[6];
+          const exists = db.ciLines.some(existing => existing.split('|')[6] === accountNo);
+          if (!exists) {
+            db.ciLines.push(cleanLine);
+            addedCIs++;
+          } else {
+            duplicateCount++;
+          }
+        }
+      });
+
+      if (addedIDs > 0 || addedCIs > 0) {
+        saveToCloud();
+        document.getElementById('bulk-id-box').value = '';
+        alert(`Malampusong na-import:\n- ${addedIDs} ka bag-ong ID records\n- ${addedCIs} ka bag-ong Credit Account (CI) records\n(Duplicate/Na-skip: ${duplicateCount})`);
+      } else {
+        alert(`Walay gidugang. Posibleng naarehistro na daan kining mga data sa sistema (Duplicate: ${duplicateCount}).`);
+      }
+    }
+
     function saveLoanProduct(event) {
       event.preventDefault();
       const editIndex = parseInt(document.getElementById('p-edit-index').value);
-      const name = document.getElementById('p-name').value;
+      const name = document.getElementById('p-name').value.trim();
+      
+      if (!name) return;
+
       if (editIndex === -1) {
-        const newId = `P${db.products.length + 1}`;
-        db.products.push({ id: newId, name });
-        alert('Na-add na ang bag-ong Loan Program!');
+        const newId = "P" + (db.products.length + 1);
+        db.products.push({ id: newId, name: name });
+        alert("Malampusong nadugang ang Loan Program!");
       } else {
         db.products[editIndex].name = name;
-        alert('Na-update na ang Loan Program!');
+        alert("Na-update ang Loan Program!");
         resetProductForm();
       }
       saveToCloud();
+      document.getElementById('productForm').reset();
     }
 
     function renderProducts() {
@@ -496,13 +585,14 @@
       db.products.forEach((p, idx) => {
         tbody.innerHTML += `<tr>
           <td class="py-3 px-3 font-semibold text-blue-600">${p.id}</td>
-          <td class="py-3 px-3 font-semibold">${p.name}</td>
+          <td class="py-3 px-3 font-medium text-slate-700">${p.name}</td>
           <td class="py-3 px-3 text-right space-x-2">
             <button onclick="editProduct(${idx})" class="text-blue-600 hover:text-blue-800" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
             <button onclick="deleteProduct(${idx})" class="text-red-600 hover:text-red-800" title="Delete"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>`;
       });
+      populateSelects();
     }
 
     function editProduct(idx) {
@@ -544,16 +634,8 @@
       if (editIndex === -1) {
         for (let i = 0; i < db.idLines.length; i++) {
           const parts = db.idLines[i].split('|');
-          const existingId = parts[4];
-          const existingFname = parts[6];
-          const existingLname = parts[8];
-          const existingMname = parts[9] || '';
-          if (existingId === subjectId) {
+          if (parts[4] === subjectId) {
             alert(`Hulata! Ang Subject ID nga "${subjectId}" anaa na sa sistema.`);
-            return;
-          }
-          if (existingFname === fname && existingLname === lname && existingMname === mname) {
-            alert(`Hulata! Ang pangalan nga "${fname} ${mname} ${lname}" narehistro na daan.`);
             return;
           }
         }
@@ -563,7 +645,7 @@
       const branch = document.getElementById('r-branch').value;
       const asOfDate = document.getElementById('r-asofdate').value;
       const idType = mname ? "13" : "10";
-      let idLine = `ID|${provider}|${branch}|${asOfDate}|${subjectId}|${idType}|${fname}|${lname}|${mname}|||${gender}|${bdate}||PH|PH||1|||||||||||||MI| ${address} PH 8500||||||||||AI| ${address} PH 8500|||||||||||||||||||||||||||3|${contact}||||||||||||||||||||||||||||||||||||||||||||`;
+      let idLine = `ID|${provider}|${branch}|${asOfDate}|${subjectId}|${idType}|${fname}|${lname}|${mname}|||${gender}|${bdate}||PH|PH||1|||||||||||||MI| ${address} PH 8500||||||||||AI| ${address} PH 8500|||||||||||||||||||||||||||||3|${contact}||||||||||||||||||||||||||||||||||||||||||||`;
 
       if (editIndex === -1) {
         db.idLines.push(idLine);
@@ -809,16 +891,16 @@
 
     function downloadReportFile() {
       const content = buildPipeReport();
-      const provider = document.getElementById('r-provider.value') || document.getElementById('r-provider').value;
+      const provider = document.getElementById('r-provider').value;
       
       const now = new Date();
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0');
       const day = String(now.getDate()).padStart(2, '0');
-      const hours = String(now.getHours()).padStart(2, 'warning' ? now.getHours() : 0).toString().padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
       const minutes = String(now.getMinutes()).padStart(2, '0');
       const seconds = String(now.getSeconds()).padStart(2, '0');
-      const timestamp = `${year}${month}${day}${String(now.getHours()).padStart(2, '0')}${minutes}${seconds}`;
+      const timestamp = `${year}${month}${day}${hours}${minutes}${seconds}`;
       
       const filename = `${provider}_CSDF_${timestamp}.txt`;
       
@@ -829,6 +911,84 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+    }
+
+    // --- MGA FUNCTION PARA SA PAG-SAVE UG PAG-DISPLAY SA MONTHLY REPORT RECORD ---
+    function saveMonthlyReportRecord() {
+      const asOfDate = document.getElementById('r-asofdate').value.trim();
+      let installmentCount = 0;
+      let nonInstallmentCount = 0;
+
+      db.ciLines.forEach(line => {
+        const parts = line.split('|');
+        const freq = parts[22] || '';
+        const term = parseInt(parts[19] || '1');
+        if (freq === 'I' || (term === 1 && freq !== 'M' && freq !== 'Q' && freq !== 'W' && freq !== 'S' && freq !== 'A')) {
+          nonInstallmentCount++;
+        } else {
+          installmentCount++;
+        }
+      });
+
+      const customerCount = db.idLines.length;
+      const totalCreditAccounts = db.ciLines.length;
+
+      const now = new Date();
+      const generatedAt = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      const newRecord = {
+        generatedAt: generatedAt,
+        asOfDate: asOfDate,
+        customerCount: customerCount,
+        installment: installmentCount,
+        nonInstallment: nonInstallmentCount,
+        totalCreditAccounts: totalCreditAccounts
+      };
+
+      if (!db.reportHistory) {
+        db.reportHistory = [];
+      }
+
+      db.reportHistory.unshift(newRecord); // Ibutang sa kinatas-an
+      saveToCloud();
+      renderReportHistory();
+      alert("Malampusong na-save ang Monthly Report Record!");
+    }
+
+    function renderReportHistory() {
+      const tbody = document.getElementById('report-history-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      
+      const history = db.reportHistory || [];
+      document.getElementById('history-count-badge').innerText = history.length;
+
+      if (history.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-slate-400">Wala pay narekord nga monthly report history.</td></tr>`;
+        return;
+      }
+
+      history.forEach((rec, idx) => {
+        tbody.innerHTML += `<tr>
+          <td class="py-2.5 px-3 font-semibold text-slate-700">${rec.generatedAt}</td>
+          <td class="py-2.5 px-3 font-mono text-blue-600">${rec.asOfDate}</td>
+          <td class="py-2.5 px-3 text-center font-bold text-slate-800">${rec.customerCount}</td>
+          <td class="py-2.5 px-3 text-center text-blue-600 font-semibold">${rec.installment}</td>
+          <td class="py-2.5 px-3 text-center text-amber-600 font-semibold">${rec.nonInstallment}</td>
+          <td class="py-2.5 px-3 text-center text-emerald-600 font-bold">${rec.totalCreditAccounts}</td>
+          <td class="py-2.5 px-3 text-right">
+            <button onclick="deleteReportHistory(${idx})" class="text-red-600 hover:text-red-800" title="Delete Record"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>`;
+      });
+    }
+
+    function deleteReportHistory(idx) {
+      if (confirm('Sigurado ka ba nga tanggalon kini nga record sa kasaysayan?')) {
+        db.reportHistory.splice(idx, 1);
+        saveToCloud();
+        renderReportHistory();
+      }
     }
 
     init();
