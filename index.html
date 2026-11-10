@@ -384,14 +384,14 @@
         { id: "P2", name: "Provident Loan" }
       ],
       idLines: [
-        `ID|CO018670|22038|31102026|22038000001|13|DARLYN|ABARRE|LLANDINO||||F|08011987||PH|PH||2|||||||||||||MI| San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI| San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|705051946|||||||||||||||||||||||3|09262484148||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|31102026|22038000004|10|CRISOGONO|ABAWAN|T.||||M|22111961||PH|PH||1|||||||||||||MI|2 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `ID|CO018670|22038|31102026|22038000011|10|RANDY|ABELLAR|GRINGIN||||M|06041984|PROSPERIDAD, ADS|PH|PH||2|||||||DIONICA FLORES GRINGIN||RODOLFO|ABELLAR|BACLAAN|SR.|MI|P-2 Lucena PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|414438851000|||||||||||||||||||||||3|09488531483||||||||||||||||||||||||||||||||||||||||||||`
+        "ID|CO018670|22038|31102026|22038000001|13|DARLYN|ABARRE|LLANDINO||||F|08011987||PH|PH||2|||||||||||||MI| San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI| San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|705051946|||||||||||||||||||||||3|09262484148||||||||||||||||||||||||||||||||||||||||||||",
+        "ID|CO018670|22038|31102026|22038000004|10|CRISOGONO|ABAWAN|T.||||M|22111961||PH|PH||1|||||||||||||MI|2 San Vicente PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||",
+        "ID|CO018670|22038|31102026|22038000011|10|RANDY|ABELLAR|GRINGIN||||M|06041984|PROSPERIDAD, ADS|PH|PH||2|||||||DIONICA FLORES GRINGIN||RODOLFO|ABELLAR|BACLAAN|SR.|MI|P-2 Lucena PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||AI|P-2 PROSPERIDAD (Capital) AGUSAN DEL SUR PH 8500||||||||||10|414438851000|||||||||||||||||||||||3|09488531483||||||||||||||||||||||||||||||||||||||||||||"
       ],
       ciLines: [
-        `CI|CO018670|22038|31102026|22038000001|B|22038-42-00675-1|21|AC||PHP|PHP|17082023||29042025|||||60000|1|NA||I||3000||0|||1|60000|1|60000|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|31102026|22038000004|B|22038-44-00321-8|10|AC||PHP|PHP|31012022||01072025|||||135000|1|NA||I||3214||0|||1||1|1|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`,
-        `CI|CO018670|22038|31102026|22038000011|B|22038-43-00658-3|10|AC||PHP|PHP|11072026||11012027|||||180000|1|NA||I||30000||0|||1|180000|0|0|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||`
+        "CI|CO018670|22038|31102026|22038000001|B|22038-42-00675-1|21|AC||PHP|PHP|17082023||29042025|||||60000|1|NA||I||3000||0|||1|60000|1|60000|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||",
+        "CI|CO018670|22038|31102026|22038000004|B|22038-44-00321-8|10|AC||PHP|PHP|31012022||01072025|||||135000|1|NA||I||3214||0|||1||1|1|6||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||",
+        "CI|CO018670|22038|31102026|22038000011|B|22038-43-00658-3|10|AC||PHP|PHP|11072026||11012027|||||180000|1|NA||I||30000||0|||1|180000|0|0|0||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
       ]
     };
 
@@ -809,19 +809,17 @@
 
     function downloadReportFile() {
       const content = buildPipeReport();
-      const provider = document.getElementById('r-provider').value;
+      const provider = document.getElementById('r-provider.value') || document.getElementById('r-provider').value;
       
-      // Pagkuha sa aktuwal nga petsa ug oras (YYYYMMDDHHMMSS) para sa filename
       const now = new Date();
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0');
       const day = String(now.getDate()).padStart(2, '0');
-      const hours = String(now.getHours()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, 'warning' ? now.getHours() : 0).toString().padStart(2, '0');
       const minutes = String(now.getMinutes()).padStart(2, '0');
       const seconds = String(now.getSeconds()).padStart(2, '0');
-      const timestamp = `${year}${month}${day}${hours}${minutes}${seconds}`;
+      const timestamp = `${year}${month}${day}${String(now.getHours()).padStart(2, '0')}${minutes}${seconds}`;
       
-      // Gi-format ang filename nga naay Provider Code, CSDF, ug timestamp sa oras
       const filename = `${provider}_CSDF_${timestamp}.txt`;
       
       const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
