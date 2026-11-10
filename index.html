@@ -125,7 +125,6 @@
     <section id="tab-members" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="space-y-6 lg:col-span-1">
-          
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
             <h2 class="text-md font-bold text-slate-800 mb-2"><i class="fa-solid fa-file-import text-blue-600 me-2"></i>Bulk Import ID & CI Lines</h2>
             <p class="text-xs text-slate-500 mb-2">I-paste dinhi ang imong daghang ID lines o Credit Account (CI) lines ug i-klik ang Import button.</p>
@@ -180,25 +179,24 @@
               </div>
             </form>
           </div>
-
         </div>
 
+        <!-- LIGHTWEIGHT BORROWER TABLE (CID ug Name Lang) -->
         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
           <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center justify-between">
-            <span><i class="fa-solid fa-users text-blue-600 me-2"></i> Registered Borrower Records (CIC Standard)</span>
+            <span><i class="fa-solid fa-users text-blue-600 me-2"></i> Registered Borrower Records</span>
             <span class="text-xs text-slate-500 font-normal">Total: <strong id="member-count-badge">0</strong></span>
           </h2>
           <div class="overflow-x-auto max-h-[700px]">
             <table class="w-full text-left text-sm text-slate-600">
               <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-xs border-b sticky top-0">
                 <tr>
-                  <th class="py-3 px-3">Subject ID</th>
-                  <th class="py-3 px-3">Name / Details</th>
-                  <th class="py-3 px-3">Raw CIC ID Line</th>
+                  <th class="py-3 px-3">Subject ID (CID)</th>
+                  <th class="py-3 px-3">Borrower Name</th>
                   <th class="py-3 px-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody id="member-table-body" class="divide-y font-mono text-xs"></tbody>
+              <tbody id="member-table-body" class="divide-y text-xs"></tbody>
             </table>
           </div>
         </div>
@@ -300,23 +298,25 @@
           </div>
         </div>
 
+        <!-- LIGHTWEIGHT LOANS TABLE (Gikinahanglan nga Detalye Ra) -->
         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
           <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center justify-between">
-            <span><i class="fa-solid fa-hand-holding-dollar text-emerald-600 me-2"></i> Loaded Credit Account (CI) Records</span>
+            <span><i class="fa-solid fa-hand-holding-dollar text-emerald-600 me-2"></i> Loaded Credit Account Records</span>
             <span class="text-xs text-slate-500 font-normal">Total Accounts: <strong id="loan-count-badge">0</strong></span>
           </h2>
           <div class="overflow-x-auto max-h-[600px]">
-            <table class="w-full text-left text-sm text-slate-600">
-              <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-xs border-b sticky top-0">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 font-semibold uppercase border-b sticky top-0">
                 <tr>
-                  <th class="py-3 px-3">Account No.</th>
-                  <th class="py-3 px-3">Member ID</th>
-                  <th class="py-3 px-3">Type</th>
-                  <th class="py-3 px-3">Raw CIC CI Line</th>
-                  <th class="py-3 px-3 text-right">Actions</th>
+                  <th class="py-2.5 px-2">CID & Name</th>
+                  <th class="py-2.5 px-2">Account No.</th>
+                  <th class="py-2.5 px-2 text-right">Loan Amount</th>
+                  <th class="py-2.5 px-2">Disb / Maturity</th>
+                  <th class="py-2.5 px-2 text-right">Monthly / Bal</th>
+                  <th class="py-2.5 px-2 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody id="loan-table-body" class="divide-y font-mono text-xs"></tbody>
+              <tbody id="loan-table-body" class="divide-y font-mono"></tbody>
             </table>
           </div>
         </div>
@@ -426,7 +426,6 @@
       reportHistory: []
     };
 
-    // Fast HTML Escaper to prevent execution lag
     function escapeHtml(str) {
       if (!str) return '';
       return String(str).replace(/[&<>"']/g, function(m) {
@@ -448,7 +447,6 @@
           db = defaultData;
         }
         
-        // Fast batch rendering using requestAnimationFrame to prevent "Page Unresponsive"
         requestAnimationFrame(() => {
           renderDashboard();
           renderProducts();
@@ -670,12 +668,12 @@
       setDefaultSubjectId();
     }
 
+    // LIGHTWEIGHT BORROWER TABLE (CID ug Name Lang)
     function renderMembers() {
       const tbody = document.getElementById('member-table-body');
       document.getElementById('member-count-badge').innerText = db.idLines.length;
       
-      // Limit DOM items rendering for performance optimization (max 100 rows preview in UI table)
-      const limit = Math.min(db.idLines.length, 100);
+      const limit = Math.min(db.idLines.length, 150);
       let html = '';
       for (let idx = 0; idx < limit; idx++) {
         const line = db.idLines[idx];
@@ -684,17 +682,16 @@
         const fname = parts[6] || '';
         const lname = parts[8] || '';
         html += `<tr>
-          <td class="py-3 px-3 font-semibold text-blue-600">${escapeHtml(memberId)}</td>
-          <td class="py-3 px-3 font-sans font-medium text-slate-700">${escapeHtml(fname)} ${escapeHtml(lname)}</td>
-          <td class="py-3 px-3 text-slate-500 truncate max-w-xs" title="${escapeHtml(line)}">${escapeHtml(line)}</td>
-          <td class="py-3 px-3 text-right space-x-2">
+          <td class="py-2.5 px-3 font-semibold font-mono text-blue-600">${escapeHtml(memberId)}</td>
+          <td class="py-2.5 px-3 font-sans font-medium text-slate-700">${escapeHtml(fname)} ${escapeHtml(lname)}</td>
+          <td class="py-2.5 px-3 text-right space-x-2">
             <button onclick="editBorrower(${idx})" class="text-blue-600 hover:text-blue-800" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
             <button onclick="deleteBorrower(${idx})" class="text-red-600 hover:text-red-800" title="Delete"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>`;
       }
-      if (db.idLines.length > 100) {
-        html += `<tr><td colspan="4" class="py-2 text-center text-slate-400 bg-slate-50">... (Ug ${db.idLines.length - 100} pa ka records nga loaded sa system/report)</td></tr>`;
+      if (db.idLines.length > 150) {
+        html += `<tr><td colspan="3" class="py-2 text-center text-slate-400 bg-slate-50">... (Ug ${db.idLines.length - 150} pa ka records)</td></tr>`;
       }
       tbody.innerHTML = html;
     }
@@ -754,7 +751,7 @@
       let payHtml = '';
       db.ciLines.forEach(line => {
         const parts = line.split('|');
-        payHtml += `<option value="${escapeHtml(parts[6])}">Acct: ${escapeHtml(parts[6])} (Member: ${escapeHtml(parts[4])})</option>`;
+        payHtml += `<option value="${escapeHtml(parts[6])}">Acct: ${escapeHtml(parts[6])} (Member: ${escapeHtml(parts[4]})</option>`;
       });
       paySelect.innerHTML = payHtml;
     }
@@ -848,34 +845,54 @@
       }
     }
 
+    // LIGHTWEIGHT LOANS TABLE (CID, Name, Account No, Loan Amt, Disb/Maturity, Monthly/Balance)
     function renderLoans() {
       const tbody = document.getElementById('loan-table-body');
       document.getElementById('loan-count-badge').innerText = db.ciLines.length;
       
-      const limit = Math.min(db.ciLines.length, 100);
+      const limit = Math.min(db.ciLines.length, 150);
       let html = '';
       for (let idx = 0; idx < limit; idx++) {
         const line = db.ciLines[idx];
         const parts = line.split('|');
-        const memberId = parts[4] || 'N/A';
-        const loanId = parts[6] || 'N/A';
+        const borrowerId = parts[4] || 'N/A';
+        const accountNo = parts[6] || 'N/A';
+        const disbDate = parts[12] || '';
+        const matDate = parts[14] || '';
+        const loanAmount = parts[19] || '0.00';
+        const monthlyPay = parts[24] || '0.00';
         const balance = parts[33] || '0.00';
-        const freq = parts[22] || 'I';
-        let typeBadge = freq === 'I' ? '<span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-[10px] font-bold">Non-Installment</span>' : '<span class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-[10px] font-bold">Installment</span>';
+
+        // Pangitaon ang pangalan sa borrower gamit ang borrowerId gikan sa idLines
+        let borrowerName = "N/A";
+        for (let j = 0; j < db.idLines.length; j++) {
+          const bParts = db.idLines[j].split('|');
+          if (bParts[4] === borrowerId) {
+            borrowerName = `${bParts[6]} ${bParts[8]}`;
+            break;
+          }
+        }
         
         html += `<tr>
-          <td class="py-3 px-3 font-semibold text-emerald-600">${escapeHtml(loanId)} <br><span class="text-[10px] text-slate-500 font-normal">Bal: ₱${escapeHtml(balance)}</span></td>
-          <td class="py-3 px-3 font-semibold">${escapeHtml(memberId)}</td>
-          <td class="py-3 px-3">${typeBadge}</td>
-          <td class="py-3 px-3 text-slate-500 truncate max-w-xs" title="${escapeHtml(line)}">${escapeHtml(line)}</td>
-          <td class="py-3 px-3 text-right space-x-2">
-            <button onclick="editLoan(${idx})" class="text-blue-600 hover:text-blue-800" title="Edit Loan"><i class="fa-solid fa-pen-to-square"></i></button>
-            <button onclick="deleteLoan(${idx})" class="text-red-600 hover:text-red-800" title="Delete Loan"><i class="fa-solid fa-trash"></i></button>
+          <td class="py-2.5 px-2">
+            <span class="font-bold text-blue-600">${escapeHtml(borrowerId)}</span><br>
+            <span class="text-[11px] text-slate-700">${escapeHtml(borrowerName)}</span>
+          </td>
+          <td class="py-2.5 px-2 font-semibold text-emerald-600">${escapeHtml(accountNo)}</td>
+          <td class="py-2.5 px-2 text-right">₱${escapeHtml(Number(loanAmount).toLocaleString())}</td>
+          <td class="py-2.5 px-2 text-[11px] text-slate-500">${escapeHtml(disbDate)}<br>${escapeHtml(matDate)}</td>
+          <td class="py-2.5 px-2 text-right">
+            <span class="text-blue-600">₱${escapeHtml(Number(monthlyPay).toLocaleString())}</span><br>
+            <span class="text-emerald-700 font-bold">Bal: ₱${escapeHtml(Number(balance).toLocaleString())}</span>
+          </td>
+          <td class="py-2.5 px-2 text-right space-x-1">
+            <button onclick="editLoan(${idx})" class="text-blue-600 hover:text-blue-800" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+            <button onclick="deleteLoan(${idx})" class="text-red-600 hover:text-red-800" title="Delete"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>`;
       }
-      if (db.ciLines.length > 100) {
-        html += `<tr><td colspan="5" class="py-2 text-center text-slate-400 bg-slate-50">... (Ug ${db.ciLines.length - 100} pa ka accounts nga loaded sa system/report)</td></tr>`;
+      if (db.ciLines.length > 150) {
+        html += `<tr><td colspan="6" class="py-2 text-center text-slate-400 bg-slate-50">... (Ug ${db.ciLines.length - 150} pa ka accounts)</td></tr>`;
       }
       tbody.innerHTML = html;
     }
