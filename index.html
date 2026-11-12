@@ -186,10 +186,21 @@
         </div>
 
         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
-          <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center justify-between">
-            <span><i class="fa-solid fa-users text-blue-600 me-2"></i> Registered Borrower Records (CIC Standard)</span>
-            <span class="text-xs text-slate-500 font-normal">Total: <strong id="member-count-badge">0</strong></span>
-          </h2>
+          <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-3">
+            <h2 class="text-lg font-bold text-slate-800 flex items-center">
+              <span><i class="fa-solid fa-users text-blue-600 me-2"></i> Registered Borrower Records</span>
+              <span class="text-xs text-slate-500 font-normal ms-2">(Total: <strong id="member-count-badge">0</strong>)</span>
+            </h2>
+            <!-- BORROWERS SEARCH BAR -->
+            <div class="w-full md:w-72">
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                  <i class="fa-solid fa-search"></i>
+                </span>
+                <input type="text" id="member-search" oninput="renderMembers()" placeholder="Pangitaa ang pangalan o ID..." class="w-full pl-9 pr-3 py-1.5 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+            </div>
+          </div>
           <div class="overflow-x-auto max-h-[700px]">
             <table class="w-full text-left text-sm text-slate-600">
               <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-xs border-b sticky top-0">
@@ -302,10 +313,21 @@
         </div>
 
         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
-          <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center justify-between">
-            <span><i class="fa-solid fa-hand-holding-dollar text-emerald-600 me-2"></i> Loaded Credit Account (CI) Records</span>
-            <span class="text-xs text-slate-500 font-normal">Total Accounts: <strong id="loan-count-badge">0</strong></span>
-          </h2>
+          <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-3">
+            <h2 class="text-lg font-bold text-slate-800 flex items-center">
+              <span><i class="fa-solid fa-hand-holding-dollar text-emerald-600 me-2"></i> Loaded Credit Account Records</span>
+              <span class="text-xs text-slate-500 font-normal ms-2">(Total: <strong id="loan-count-badge">0</strong>)</span>
+            </h2>
+            <!-- LOANS SEARCH BAR -->
+            <div class="w-full md:w-72">
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                  <i class="fa-solid fa-search"></i>
+                </span>
+                <input type="text" id="loan-search" oninput="renderLoans()" placeholder="Pangitaa ang Acct No., Ngalan o ID..." class="w-full pl-9 pr-3 py-1.5 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+            </div>
+          </div>
           <div class="overflow-x-auto max-h-[600px]">
             <table class="w-full text-left text-sm text-slate-600">
               <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-xs border-b sticky top-0">
@@ -357,7 +379,7 @@
             <i class="fa-solid fa-eye"></i><span>Refresh Preview</span>
           </button>
           <button onclick="downloadReportFile(); saveReportToHistory(); renderReportHistory();" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg text-sm shadow transition flex items-center space-x-2">
-            <i class="fa-solid fa-download"></i><span>Download & Save Report</span>
+            <i class="fa-solid fa-download"></i><span>Download .txt file</span>
           </button>
         </div>
 
@@ -658,8 +680,28 @@
     function renderMembers() {
       const tbody = document.getElementById('member-table-body');
       tbody.innerHTML = '';
-      document.getElementById('member-count-badge').innerText = db.idLines.length;
-      db.idLines.forEach((line, idx) => {
+      const searchQuery = document.getElementById('member-search').value.toLowerCase().trim();
+      
+      let filteredMembers = db.idLines.map((line, idx) => ({ line, idx })).filter(item => {
+        const parts = item.line.split('|');
+        const memberId = (parts[4] || '').toLowerCase();
+        const fname = (parts[6] || '').toLowerCase();
+        const lname = (parts[8] || '').toLowerCase();
+        const fullName = `${fname} ${lname}`;
+        
+        return memberId.includes(searchQuery) || fullName.includes(searchQuery);
+      });
+
+      document.getElementById('member-count-badge').innerText = `${filteredMembers.length} / ${db.idLines.length}`;
+
+      if (filteredMembers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-400">Walay nakit-an nga borrower.</td></tr>`;
+        return;
+      }
+
+      filteredMembers.forEach(item => {
+        const line = item.line;
+        const idx = item.idx;
         const parts = line.split('|');
         const memberId = parts[4] || 'N/A';
         const fname = parts[6] || '';
@@ -826,9 +868,35 @@
     function renderLoans() {
       const tbody = document.getElementById('loan-table-body');
       tbody.innerHTML = '';
-      document.getElementById('loan-count-badge').innerText = db.ciLines.length;
+      const searchQuery = document.getElementById('loan-search').value.toLowerCase().trim();
+
+      let filteredLoans = db.ciLines.map((line, idx) => ({ line, idx })).filter(item => {
+        const parts = item.line.split('|');
+        const memberId = (parts[4] || '').toLowerCase();
+        const accountNo = (parts[6] || '').toLowerCase();
+        
+        let borrowerName = '';
+        for (let i = 0; i < db.idLines.length; i++) {
+          const idParts = db.idLines[i].split('|');
+          if (idParts[4] === parts[4]) {
+            borrowerName = `${idParts[6]} ${idParts[8]}`.toLowerCase();
+            break;
+          }
+        }
+
+        return memberId.includes(searchQuery) || accountNo.includes(searchQuery) || borrowerName.includes(searchQuery);
+      });
+
+      document.getElementById('loan-count-badge').innerText = `${filteredLoans.length} / ${db.ciLines.length}`;
+
+      if (filteredLoans.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="py-4 text-center text-slate-400">Walay nakit-an nga loan account.</td></tr>`;
+        return;
+      }
       
-      db.ciLines.forEach((line, idx) => {
+      filteredLoans.forEach(item => {
+        const line = item.line;
+        const idx = item.idx;
         const parts = line.split('|');
         const memberId = parts[4] || 'N/A';
         const accountNo = parts[6] || 'N/A';
@@ -837,7 +905,6 @@
         const matDate = parts[14] || 'N/A';
         const freqCode = parts[22] || 'M';
         
-        // Map frequency code to descriptive label
         let freqLabel = freqCode;
         if (freqCode === 'M') freqLabel = 'Monthly (M)';
         else if (freqCode === 'I') freqLabel = 'Installment-Free (I)';
