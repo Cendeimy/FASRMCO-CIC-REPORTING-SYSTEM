@@ -338,8 +338,6 @@
                   <th class="py-3 px-3">Loan Amount</th>
                   <th class="py-3 px-3">Disb. Date</th>
                   <th class="py-3 px-3">Maturity</th>
-                  <th class="py-3 px-3">Monthly Payment Amount</th>
-                  <th class="py-3 px-3">Payment Frequency</th>
                   <th class="py-3 px-3">Balance</th>
                   <th class="py-3 px-3 text-right">Actions</th>
                 </tr>
@@ -890,7 +888,7 @@
       document.getElementById('loan-count-badge').innerText = `${filteredLoans.length} / ${db.ciLines.length}`;
 
       if (filteredLoans.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="py-4 text-center text-slate-400">Walay nakit-an nga loan account.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="py-4 text-center text-slate-400">Walay nakit-an nga loan account.</td></tr>`;
         return;
       }
       
@@ -903,15 +901,6 @@
         const loanAmount = parseFloat(parts[19] || 0).toLocaleString('en-US', {minimumFractionDigits: 2});
         const disbDate = parts[12] || 'N/A';
         const matDate = parts[14] || 'N/A';
-        const freqCode = parts[22] || 'M';
-        
-        let freqLabel = freqCode;
-        if (freqCode === 'M') freqLabel = 'Monthly (M)';
-        else if (freqCode === 'I') freqLabel = 'Installment-Free (I)';
-        else if (freqCode === 'Q') freqLabel = 'Quarterly (Q)';
-        else if (freqCode === 'W') freqLabel = 'Weekly (W)';
-
-        const monthlyPayment = parseFloat(parts[24] || 0).toLocaleString('en-US', {minimumFractionDigits: 2});
         const balance = parseFloat(parts[33] || 0).toLocaleString('en-US', {minimumFractionDigits: 2});
 
         let borrowerName = 'N/A';
@@ -930,8 +919,6 @@
           <td class="py-2.5 px-3 font-semibold">₱${loanAmount}</td>
           <td class="py-2.5 px-3 font-mono">${disbDate}</td>
           <td class="py-2.5 px-3 font-mono">${matDate}</td>
-          <td class="py-2.5 px-3 font-semibold text-blue-600">₱${monthlyPayment}</td>
-          <td class="py-2.5 px-3 font-medium text-slate-600">${freqLabel}</td>
           <td class="py-2.5 px-3 font-semibold text-emerald-600">₱${balance}</td>
           <td class="py-2.5 px-3 text-right space-x-2">
             <button onclick="editLoan(${idx})" class="text-blue-600 hover:text-blue-800" title="Edit Loan"><i class="fa-solid fa-pen-to-square"></i></button>
